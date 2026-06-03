@@ -1,0 +1,16 @@
+# Build artifacts and deps (defence in depth — these are also gitignored)
+.next/
+node_modules/
+public/
+package-lock.json
+
+# Hand-authored or scaffold-provided documents — formatting is intentional
+PLAN.html
+QUESTIONNAIRE.md
+TESTING.md
+README.md
+AGENTS.md
+CLAUDE.md
+
+# Generated reports
+sim-report.json

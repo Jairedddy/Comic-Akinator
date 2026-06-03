@@ -1,0 +1,1811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comic Akinator — Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-card: #14141a;
+    --bg-card-2: #1c1c24;
+    --bg-detail: #0e0e13;
+    --ink: #f5f5f7;
+    --ink-dim: #a0a0aa;
+    --ink-dimmer: #6b6b75;
+    --accent: #ffd400;
+    --accent-2: #e63946;
+    --accent-3: #4cc9f0;
+    --done: #5cd97a;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.18);
+    --shadow: 0 6px 0 rgba(0,0,0,0.6), 0 14px 30px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(230,57,70,0.12), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(76,201,240,0.10), transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255,212,0,0.04), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 6px 6px;
+    z-index: 0;
+    mix-blend-mode: screen;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 36px 24px 28px;
+    border: 3px solid var(--ink);
+    background: linear-gradient(135deg, #1a1a22 0%, #0e0e13 100%);
+    box-shadow: var(--shadow);
+    position: relative;
+    margin-bottom: 32px;
+    transform: rotate(-0.3deg);
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 6px;
+    border: 1px dashed rgba(255,212,0,0.35);
+    pointer-events: none;
+  }
+  .kicker {
+    display: inline-block;
+    background: var(--accent-2);
+    color: #fff;
+    padding: 4px 14px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    font-size: 18px;
+    transform: rotate(-2deg);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(46px, 8vw, 84px);
+    line-height: 0.95;
+    letter-spacing: 3px;
+    margin: 14px 0 6px;
+    color: var(--accent);
+    text-shadow: 3px 3px 0 var(--accent-2), 6px 6px 0 var(--ink);
+  }
+  .subtitle {
+    color: var(--ink-dim);
+    font-size: 16px;
+    max-width: 680px;
+    margin: 10px auto 0;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .progress-stats { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+  .progress-num {
+    font-family: 'Bangers', cursive;
+    font-size: 42px;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+  .progress-label {
+    color: var(--ink-dim);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .progress-bar {
+    grid-column: 1 / -1;
+    height: 14px;
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: repeating-linear-gradient(45deg, var(--accent) 0 10px, #e6b800 10px 20px);
+    transition: width 400ms cubic-bezier(.5,1.4,.5,1);
+  }
+  .icon-btn {
+    background: transparent;
+    border: 2px solid var(--accent-2);
+    color: var(--accent-2);
+    padding: 8px 16px;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 150ms;
+    font-size: 16px;
+  }
+  .icon-btn:hover { background: var(--accent-2); color: #fff; }
+  .icon-btn.alt { border-color: var(--accent-3); color: var(--accent-3); }
+  .icon-btn.alt:hover { background: var(--accent-3); color: var(--bg); }
+
+  /* Phase cards */
+  .phase {
+    background: var(--bg-card);
+    border: 3px solid var(--ink);
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .phase.completed { border-color: var(--done); }
+  .phase.completed .phase-head { background: linear-gradient(90deg, var(--done) 0%, #3da75a 100%); color: #0a0a0c; }
+
+  .phase-head {
+    background: linear-gradient(90deg, var(--accent) 0%, #e6b800 100%);
+    color: #0a0a0c;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 3px solid var(--ink);
+  }
+  .phase-head .label {
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    font-size: 14px;
+    background: #0a0a0c;
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .phase-title {
+    font-family: 'Bangers', cursive;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin: 0;
+    flex: 1;
+    min-width: 240px;
+  }
+  .phase-meta {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.85;
+  }
+  .phase-mini-progress { width: 100%; height: 4px; background: rgba(0,0,0,0.35); }
+  .phase-mini-fill { height: 100%; width: 0%; background: #0a0a0c; transition: width 300ms ease; }
+  .phase-body { padding: 0; }
+
+  /* Milestone rows */
+  .milestone {
+    border-top: 1px solid var(--border);
+    transition: background 120ms;
+  }
+  .milestone:first-child { border-top: none; }
+
+  .milestone-row {
+    display: grid;
+    grid-template-columns: 56px 1fr 32px;
+    gap: 0;
+    padding: 14px 20px;
+    align-items: start;
+    cursor: pointer;
+  }
+  .milestone-row:hover { background: var(--bg-card-2); }
+
+  .ms-checkbox {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--ink);
+    background: #0a0a0c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 150ms;
+    position: relative;
+    cursor: pointer;
+  }
+  .ms-checkbox:hover { border-color: var(--accent); }
+  .ms-checkbox::after {
+    content: "";
+    width: 14px; height: 14px;
+    background: var(--done);
+    transform: scale(0) rotate(45deg);
+    transition: transform 200ms cubic-bezier(.5,1.6,.5,1);
+  }
+  .milestone.done .ms-checkbox { border-color: var(--done); }
+  .milestone.done .ms-checkbox::after { transform: scale(1) rotate(0deg); }
+
+  .ms-content { padding-right: 8px; }
+  .ms-id {
+    font-family: 'Bangers', cursive;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  .ms-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .milestone.done .ms-title {
+    color: var(--ink-dim);
+    text-decoration: line-through;
+    text-decoration-color: var(--done);
+    text-decoration-thickness: 2px;
+  }
+  .ms-desc {
+    color: var(--ink-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  .ms-chevron {
+    color: var(--ink-dimmer);
+    font-size: 22px;
+    transition: transform 220ms ease, color 220ms;
+    align-self: center;
+    text-align: center;
+    user-select: none;
+  }
+  .milestone.expanded .ms-chevron {
+    transform: rotate(180deg);
+    color: var(--accent);
+  }
+
+  /* Details panel */
+  .ms-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 380ms cubic-bezier(.4,0,.2,1);
+    background: var(--bg-detail);
+  }
+  .milestone.expanded .ms-details { max-height: 4000px; }
+
+  .ms-details-inner {
+    padding: 18px 26px 26px 76px;
+    border-top: 1px dashed var(--border-strong);
+  }
+  .ms-details h4 {
+    font-family: 'Bangers', cursive;
+    letter-spacing: 2px;
+    color: var(--accent-3);
+    font-size: 16px;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+  }
+  .ms-details h4:first-child { margin-top: 0; }
+  .ms-details p { margin: 6px 0; color: var(--ink-dim); font-size: 14px; }
+  .ms-details ol, .ms-details ul {
+    padding-left: 22px;
+    margin: 6px 0;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .ms-details li { margin: 6px 0; }
+  .ms-details li code, .ms-details p code, .ms-details strong code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12.5px;
+    background: #000;
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .ms-details pre {
+    background: #000;
+    border: 1px solid var(--border-strong);
+    color: #d8d8e0;
+    padding: 12px 14px;
+    border-radius: 3px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+  .ms-details pre .c { color: var(--ink-dimmer); }
+  .ms-details pre .k { color: var(--accent-3); }
+  .ms-details pre .s { color: var(--accent); }
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-right: 6px;
+    letter-spacing: 0.5px;
+  }
+  .badge-time { background: rgba(76,201,240,0.15); color: var(--accent-3); border: 1px solid rgba(76,201,240,0.4); }
+  .badge-risk { background: rgba(230,57,70,0.15); color: var(--accent-2); border: 1px solid rgba(230,57,70,0.4); }
+  .ms-details .accept {
+    background: rgba(92,217,122,0.06);
+    border-left: 3px solid var(--done);
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 2px;
+  }
+  .ms-details .accept strong { color: var(--done); }
+
+  /* Section divider */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 44px 0 24px;
+  }
+  .section-divider .line {
+    flex: 1;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 12px, transparent 12px 18px);
+  }
+  .section-divider .title {
+    font-family: 'Bangers', cursive;
+    font-size: 32px;
+    letter-spacing: 4px;
+    color: var(--accent-3);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+
+  /* POW! burst */
+  .pow {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-family: 'Bangers', cursive;
+    font-size: 120px;
+    color: var(--accent);
+    text-shadow: 6px 6px 0 var(--accent-2), 12px 12px 0 var(--ink);
+    z-index: 100;
+    pointer-events: none;
+    transition: transform 280ms cubic-bezier(.4,1.7,.4,1), opacity 280ms;
+    opacity: 0;
+  }
+  .pow.show { transform: translate(-50%, -50%) scale(1) rotate(-8deg); opacity: 1; }
+
+  footer {
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--border);
+  }
+  footer code { background: var(--bg-card); padding: 2px 6px; border-radius: 2px; color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 20px 12px 60px; }
+    .hero { padding: 26px 16px 22px; }
+    .progress-wrap { grid-template-columns: 1fr; }
+    .milestone-row { grid-template-columns: 36px 1fr 24px; padding: 12px 14px; gap: 10px; }
+    .ms-details-inner { padding: 16px 14px 18px 14px; }
+    .phase-head { padding: 12px 14px; }
+  }
+
+  @media print {
+    body::before { display: none; }
+    body { background: white; color: black; }
+    .phase, .hero, .progress-wrap { box-shadow: none; border-color: #000; }
+    .icon-btn { display: none; }
+    .ms-details { max-height: none !important; }
+    .ms-chevron { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="pow" id="pow">POW!</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="kicker">FAN PROJECT &middot; v1.0 BUILD PLAN</span>
+    <h1>COMIC<br>AKINATOR</h1>
+    <p class="subtitle">A Marvel + DC character-guessing game built in 2&ndash;4 weeks. Entropy-based inference over ~500 well-traited characters (3000+ in Phase 2). Free tier all the way down.</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-stats">
+      <span class="progress-num" id="pct">0%</span>
+      <div>
+        <div class="progress-label">Done</div>
+        <div><span id="done-count">0</span> / <span id="total-count">0</span> milestones</div>
+      </div>
+    </div>
+    <button class="icon-btn alt" id="expand-all" title="Expand all">Expand All</button>
+    <button class="icon-btn" id="reset" title="Clear all checkboxes">Reset</button>
+    <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+  </div>
+
+  <!-- ====================== MVP (v1.0) ====================== -->
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="title">MVP &middot; v1.0</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- WEEK 1 -->
+  <section class="phase" data-phase="week1">
+    <div class="phase-head">
+      <span class="label">WEEK 1</span>
+      <h2 class="phase-title">Data &amp; Engine (no UI yet)</h2>
+      <span class="phase-meta">Goal: a working brain</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- M1.1 -->
+      <div class="milestone" data-id="m1.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M1.1</span><span class="ms-title">Repo &amp; scaffold</span></div>
+            <div class="ms-desc">Next.js 16 + TS + Tailwind v4 + Radix utility layer + ESLint + Prettier. Manual-testing convention established.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~1h</span><span class="badge badge-risk">low risk</span></p>
+
+          <h4>Goal</h4>
+          <p>Stand up the empty project shell so every later step has something to commit into. No game logic yet &mdash; pure foundation. No automated test framework: this project uses manual <code>Testing</code> sections per milestone (see <a href="TESTING.md"><code>TESTING.md</code></a>).</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>From this folder, scaffold the app: <code>npx create-next-app@latest . --typescript --app --tailwind --eslint --src-dir --import-alias "@/*" --disable-git --yes</code>. <strong>Caveat:</strong> if the folder name contains spaces or capitals (npm name restriction), scaffold into a sub-dir (<code>comic-akinator</code>) and move the contents up one level.</li>
+            <li>Install runtime deps + Radix utility layer: <code>npm i zustand framer-motion lottie-react clsx tailwind-merge class-variance-authority</code>. Radix primitives themselves (<code>@radix-ui/react-dialog</code>, etc.) get added on demand starting in M2.x &mdash; not all at once here.</li>
+            <li>Install Prettier + Tailwind plugin + <code>tsx</code> (for running TS scripts): <code>npm i -D prettier prettier-plugin-tailwindcss tsx</code>. Add <code>.prettierrc</code> with <code>{ "plugins": ["prettier-plugin-tailwindcss"] }</code>.</li>
+            <li>Create <code>src/lib/utils.ts</code> exporting <code>cn(...inputs)</code> = <code>twMerge(clsx(inputs))</code>. Every Radix wrapper component in M2.x will use this helper.</li>
+            <li>Add the script block to <code>package.json</code>:
+              <pre><span class="s">"dev"</span>: <span class="s">"next dev"</span>,
+<span class="s">"build"</span>: <span class="s">"npm run dataset:validate &amp;&amp; next build"</span>,
+<span class="s">"sim"</span>: <span class="s">"tsx scripts/sim.ts"</span>,
+<span class="s">"dataset:build"</span>: <span class="s">"tsx scripts/build-dataset.ts"</span>,
+<span class="s">"dataset:validate"</span>: <span class="s">"tsx scripts/validate-dataset.ts"</span>,
+<span class="s">"lint"</span>: <span class="s">"eslint"</span>,
+<span class="s">"format"</span>: <span class="s">"prettier --write ."</span></pre>
+              <p><code>npm run build</code> will fail at the <code>dataset:validate</code> step until M1.2 ships <code>scripts/validate-dataset.ts</code>. That&rsquo;s intentional &mdash; the gate prevents shipping with a missing or malformed dataset.</p>
+            </li>
+            <li>Add <code>.gitignore</code> entries for anything missed by <code>create-next-app</code>: <code>.env.local</code>, <code>sim-report.json</code>. (Scaffold already covers <code>.next</code>, <code>node_modules</code>, <code>coverage</code>.)</li>
+            <li>Read <a href="TESTING.md"><code>TESTING.md</code></a>. Every future milestone gets a <code>Testing</code> section in the format described there &mdash; M1.1&rsquo;s is below as the first example.</li>
+            <li>First commit: <code>git init &amp;&amp; git add -A &amp;&amp; git commit -m "chore: scaffold Next.js + Tailwind + Radix utility layer"</code></li>
+            <li>Create a public GitHub repo named <code>comic-akinator</code> and <code>git push -u origin main</code>.</li>
+          </ol>
+
+          <h4>Files touched</h4>
+          <ul>
+            <li><code>package.json</code>, <code>tsconfig.json</code>, <code>next.config.ts</code>, <code>postcss.config.mjs</code> (Tailwind v4 uses CSS-first config &mdash; no <code>tailwind.config.ts</code>)</li>
+            <li><code>.prettierrc</code>, <code>.gitignore</code>, <code>TESTING.md</code></li>
+            <li>Initial <code>src/app/layout.tsx</code>, <code>src/app/page.tsx</code>, <code>src/app/globals.css</code>, <code>src/lib/utils.ts</code></li>
+          </ul>
+
+          <h4>Testing</h4>
+          <ol>
+            <li><strong>Run:</strong> <code>npm run dev</code></li>
+            <li><strong>Look for:</strong> terminal shows <code>&#x25B2; Next.js 16.x</code> and <code>Local: http://localhost:3000</code>, no errors.</li>
+            <li><strong>Run:</strong> visit <code>http://localhost:3000</code> in a browser.</li>
+            <li><strong>Look for:</strong> the default Next.js welcome page renders. Browser DevTools console has no red errors.</li>
+            <li><strong>Run:</strong> visit <code>http://localhost:3000/this-route-does-not-exist</code></li>
+            <li><strong>Look for:</strong> the Next.js default 404 page.</li>
+            <li><strong>Run:</strong> stop dev (Ctrl+C), then <code>npm run lint</code></li>
+            <li><strong>Look for:</strong> exits 0 with no errors. Warnings on the scaffold files are tolerable.</li>
+            <li><strong>Run:</strong> <code>npx prettier --check .</code></li>
+            <li><strong>Look for:</strong> either &ldquo;All matched files use Prettier code style!&rdquo; or a list of files needing format &mdash; the list is informational, not a failure. Run <code>npm run format</code> to fix.</li>
+            <li><strong>Red flag:</strong> dev-server crash on startup, &ldquo;Module not found&rdquo; errors in the browser, any TypeScript error blocking the page render, or an SSL cert error when running <code>npm install</code> (indicates corp-proxy issue &mdash; resolve before M2.x).</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li><code>npm run dev</code> serves the Next welcome page at <code>:3000</code> with no console errors.</li>
+              <li><code>src/lib/utils.ts</code> exports <code>cn()</code>.</li>
+              <li><code>npm run lint</code> exits clean.</li>
+              <li>Repo initialized and pushed to GitHub.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M1.2 -->
+      <div class="milestone" data-id="m1.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M1.2</span><span class="ms-title">Data pipeline script</span></div>
+            <div class="ms-desc">Merge Kaggle + Superhero API + Fandom thumbnails into a deduped <code>characters.json</code>.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h</span><span class="badge badge-risk">data risk</span></p>
+
+          <h4>Goal</h4>
+          <p>One offline script that produces a canonical <code>data/characters.json</code> from public sources. Everything downstream &mdash; the engine, the UI, the sim &mdash; reads from this file.</p>
+
+          <h4>Sources (all free, no key)</h4>
+          <ul>
+            <li><strong>Kaggle Marvel + DC characters CSV</strong> &mdash; download once, save to <code>scripts/sources/kaggle-marvel.csv</code> and <code>kaggle-dc.csv</code>. Gives alignment, gender, eye/hair color, publisher, year of first appearance.</li>
+            <li><strong>Superhero API JSON dump</strong> &mdash; pull from <code>https://akabab.github.io/superhero-api/api/all.json</code>. 731 characters with powerstats, biography, appearance, work, connections. Save to <code>scripts/sources/superhero-api.json</code>.</li>
+            <li><strong>Fandom / Wikipedia thumbnails</strong> &mdash; resolve image URLs by querying Wikipedia REST <code>/page/summary/{name}</code> (free, no key). Cache results to <code>scripts/sources/image-cache.json</code> so re-runs are fast.</li>
+          </ul>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Create <code>scripts/sources/</code> directory and download the three sources once. Commit the CSV/JSON; do NOT commit <code>image-cache.json</code> initially &mdash; let it rebuild.</li>
+            <li>Install pipeline-only deps: <code>npm i -D tsx csv-parse</code></li>
+            <li>Build <code>scripts/lib/normalize.ts</code> with the canonical schema and helpers: <code>slugify(name)</code>, <code>dedupeKey(realName, publisher)</code>.</li>
+            <li>Build <code>scripts/build-dataset.ts</code> doing in order: <strong>(a)</strong> load CSV + JSON sources &rarr; <strong>(b)</strong> normalize each into a partial <code>Character</code> &rarr; <strong>(c)</strong> merge on dedupeKey, preferring richer fields &rarr; <strong>(d)</strong> resolve image URLs via Wikipedia (with cache + 300ms rate-limit between requests) &rarr; <strong>(e)</strong> compute a <code>traitCompleteness</code> score per character &rarr; <strong>(f)</strong> select top 500 by completeness &times; popularity &rarr; <strong>(g)</strong> write to <code>data/characters.json</code>.</li>
+            <li>Build <code>scripts/validate-dataset.ts</code>: assert every character has id, name, publisher, image, &ge; 8 non-null traits. Exit nonzero on violation (this gates <code>npm run build</code>).</li>
+            <li>Run <code>npm run dataset:build</code>. Inspect output. Spot-check 10 random characters &mdash; do real names + publishers + images match?</li>
+            <li>Commit <code>data/characters.json</code> (it is the source of truth for the app, not a build artifact).</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li><code>data/characters.json</code> exists with ~500 entries.</li>
+              <li>Every entry has a working image URL and &ge; 8 populated traits.</li>
+              <li><code>npm run dataset:validate</code> exits zero.</li>
+              <li>Top 50 most-popular Marvel/DC heroes are all present (Spider-Man, Batman, Superman, Iron Man, Wonder Woman, &hellip;).</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M1.3 -->
+      <div class="milestone" data-id="m1.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M1.3</span><span class="ms-title">Trait taxonomy &amp; question bank</span></div>
+            <div class="ms-desc">~120 traits across 14 categories. ~150 questions with inverse phrasing.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~5h</span><span class="badge badge-risk">creative</span></p>
+
+          <h4>Goal</h4>
+          <p>A stable controlled vocabulary of traits + a hand-authored set of questions that map to them. The engine's question-picker can only ask what is in this file.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Create <code>data/traits.json</code> as <code>{ id, category, label, polarity }</code>. Categories (from your questionnaire choice): <em>Universe, Alignment, Gender, Species, Powers, Equipment, Teams, Era, Appearance, Costume, Secret Identity, Origin City, Adaptations, Death/Resurrection</em>. Aim for ~120 trait IDs total.</li>
+            <li>Backfill trait values into <code>characters.json</code> &mdash; for each trait, set boolean or 0&ndash;1 weight where known, <code>null</code> where unknown. For MVP, focus on the top 500 and accept many nulls in lesser-known characters &mdash; the engine handles unknowns.</li>
+            <li>Create <code>data/questions.json</code> as <code>{ id, trait, text, inverse, category, cost: 1 }</code>. ~150 entries. Examples: <em>"Does your character have superhuman strength?"</em>, inverse <em>"No super strength"</em>. Aim for 2&ndash;3 questions per high-signal trait so the engine has variety.</li>
+            <li>Add a sanity script in <code>validate-dataset.ts</code>: every question's <code>trait</code> must exist in <code>traits.json</code>; every trait must appear in &ge; 1 question.</li>
+            <li>Manual sweep: read every question aloud &mdash; if it could be misread or has cultural ambiguity, rewrite.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li><code>traits.json</code> has ~120 entries covering all 14 categories.</li>
+              <li><code>questions.json</code> has ~150 entries, all mapping to real traits.</li>
+              <li>Validation passes.</li>
+              <li>Each top-50 character has &ge; 15 non-null trait values.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M1.4 -->
+      <div class="milestone" data-id="m1.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M1.4</span><span class="ms-title">Entropy engine module</span></div>
+            <div class="ms-desc">Bayesian posterior + info-gain question selection + adaptive guess + wrong-guess loop.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~10h</span><span class="badge badge-risk">core IP</span></p>
+
+          <h4>Goal</h4>
+          <p>The brain. A pure-TypeScript module with no React, no DOM, no I/O. Inputs: dataset + current answer history. Outputs: next question or a guess.</p>
+
+          <h4>Module layout (<code>src/lib/engine/</code>)</h4>
+          <ul>
+            <li><code>types.ts</code> &mdash; <code>Answer</code>, <code>Belief</code>, <code>GameState</code>, <code>EngineDecision</code></li>
+            <li><code>likelihood.ts</code> &mdash; maps <code>(answer, traitValue)</code> &rarr; multiplier (see plan&rsquo;s answer table)</li>
+            <li><code>posterior.ts</code> &mdash; <code>update(belief, question, answer, chars)</code> with min-floor 1e-6, renormalize</li>
+            <li><code>entropy.ts</code> &mdash; <code>entropy(belief)</code></li>
+            <li><code>select.ts</code> &mdash; <code>nextQuestion(state, pool)</code> with info-gain + diversity penalty (0.85x if category is in last 2)</li>
+            <li><code>guess.ts</code> &mdash; <code>shouldGuess(belief, turn)</code> + <code>shouldGiveUp(belief, turn, missCount)</code></li>
+            <li><code>index.ts</code> &mdash; the high-level <code>decide(state)</code> orchestrator</li>
+          </ul>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Write <code>types.ts</code> first &mdash; pin the shapes before any logic.</li>
+            <li>Implement <code>likelihood.ts</code>. Unit-test the 5 answer types against trait values 0, 0.5, 1, and null.</li>
+            <li>Implement <code>posterior.ts</code>. Unit-test: a "Yes" to a trait where only one character has value 1.0 should drive that character&rsquo;s posterior to ~1.0 after one update.</li>
+            <li>Implement <code>entropy.ts</code> (Shannon, base 2). Unit-test entropy(uniform) &asymp; log2(N).</li>
+            <li>Implement <code>select.ts</code>. Test: with a clear binary split (half characters Marvel, half DC), <em>"Is your character from Marvel?"</em> wins expected info-gain.</li>
+            <li>Implement <code>guess.ts</code> with the threshold table from the plan (turn &ge; 8 + top1 &gt; 0.85 or top1/top2 &gt; 6, soft cap 20, hard cap 25).</li>
+            <li>Implement <code>index.ts</code> &mdash; returns <code>{ kind: 'question', q } | { kind: 'guess', characterId } | { kind: 'giveup' }</code>.</li>
+            <li>Cover everything with Vitest. Target 90%+ coverage on the engine folder; it's the riskiest code.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>All engine unit tests pass.</li>
+              <li>Engine is pure: no <code>window</code>, no <code>localStorage</code>, no React imports.</li>
+              <li>Manually scripting a game with 15 Yes/No answers against a known character lands on the right guess in &lt;25 turns.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M1.5 -->
+      <div class="milestone" data-id="m1.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M1.5</span><span class="ms-title">Simulation harness baseline</span></div>
+            <div class="ms-desc">Auto-play every character. Report accuracy, avg questions, worst offenders.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~3h</span><span class="badge badge-risk">important</span></p>
+
+          <h4>Goal</h4>
+          <p>An offline benchmark that plays a full game for every character in the dataset, using that character&rsquo;s own traits as the oracle. Gives you a single number for "how good is the engine right now?" and a list of characters the engine struggles with &mdash; gold for tuning.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Create <code>scripts/sim.ts</code>.</li>
+            <li>For each character C in the dataset: initialize a fresh <code>GameState</code>; loop calling <code>engine.decide(state)</code>; when it asks a question, answer using C&rsquo;s trait value (1.0&rarr;Yes, 0.0&rarr;No, 0.4&ndash;0.6&rarr;Probably, null&rarr;Don&rsquo;t know); when it guesses, record hit/miss; if miss, continue per the wrong-guess loop; cap at 30 turns.</li>
+            <li>Aggregate: % correctly guessed, average question count, P95 question count, top 20 characters by failure.</li>
+            <li>Write a CLI flag <code>--noise=0.1</code> that flips 10% of oracle answers to "Don&rsquo;t know" to simulate fuzzy human players.</li>
+            <li>Save the report to <code>sim-report.json</code> for diff-friendly tracking across commits.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li><code>npm run sim</code> finishes in under 60s for 500 characters.</li>
+              <li>Report shows a baseline accuracy number (any number &mdash; tuning happens in M4.1).</li>
+              <li>Top-20-failures list is human-readable; you can eyeball <em>why</em> the engine missed (sparse traits, ambiguous answers, etc.).</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WEEK 2 -->
+  <section class="phase" data-phase="week2">
+    <div class="phase-head">
+      <span class="label">WEEK 2</span>
+      <h2 class="phase-title">Core Gameplay UI</h2>
+      <span class="phase-meta">Goal: playable end-to-end</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- M2.1 -->
+      <div class="milestone" data-id="m2.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.1</span><span class="ms-title">App shell &amp; comic-cinematic theme</span></div>
+            <div class="ms-desc">Dark base, halftone overlay, Bangers headers, routes for every screen.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h</span></p>
+
+          <h4>Goal</h4>
+          <p>A consistent shell + theme so every later screen drops into a polished frame instead of growing organically.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Load Bangers + Inter + JetBrains Mono via <code>next/font/google</code> in <code>src/app/layout.tsx</code>. Apply via CSS variables.</li>
+            <li>Override Tailwind theme in <code>tailwind.config.ts</code>: dark base colors, comic accents (<code>accent</code>: <code>#ffd400</code>, <code>villain</code>: <code>#e63946</code>, <code>hero</code>: <code>#4cc9f0</code>, <code>victory</code>: <code>#5cd97a</code>). Add <code>fontFamily.display</code> = Bangers.</li>
+            <li>Build <code>src/components/layout/AppShell.tsx</code> with header (logo + nav), main slot, footer (disclaimer + privacy link).</li>
+            <li>Create a global halftone background via a fixed SVG dot pattern as <code>::before</code>. Same recipe as this plan HTML.</li>
+            <li>Stub routes: <code>/</code>, <code>/play</code>, <code>/result/[id]</code>, <code>/history</code>, <code>/about</code>, <code>/privacy</code>. Each gets a placeholder heading inside <code>AppShell</code>.</li>
+            <li>Add <code>not-found.tsx</code> with comic-style "Off-panel!" 404.</li>
+            <li>Run Lighthouse on <code>/</code> &mdash; should already score 90+ since there&rsquo;s nothing heavy yet. Set the baseline.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>All 6 routes load with matching dark comic theme.</li>
+              <li>Fonts swap in under 100ms.</li>
+              <li>Theme tokens are used (no hard-coded hex outside <code>tailwind.config.ts</code>).</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M2.2 -->
+      <div class="milestone" data-id="m2.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.2</span><span class="ms-title">Question screen</span></div>
+            <div class="ms-desc">Big question text, 5 answer buttons with keyboard 1&ndash;5, progress dots.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~5h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>src/components/play/QuestionCard.tsx</code> &mdash; large display-font question, AnimatePresence wrap so questions cross-fade.</li>
+            <li><code>AnswerButtonRow.tsx</code> &mdash; 5 buttons: Yes / Probably / Don&rsquo;t know / Probably not / No. Each shows its keyboard shortcut (1&ndash;5) in a small chip.</li>
+            <li>Wire keyboard: <code>useEffect</code> with <code>window.addEventListener('keydown', ...)</code> mapping 1&ndash;5 to answer dispatch. Clean up on unmount.</li>
+            <li><code>ProgressDots.tsx</code> &mdash; 25 dots in a row, current turn highlighted; previous turns colored by answer type (Yes=green, No=red, etc.).</li>
+            <li><code>HintLine.tsx</code> &mdash; subtle "I'm thinking about {N} characters" hint based on the count of characters with non-trivial posterior (&gt; 0.001).</li>
+            <li>For now, drive these with a fake state object &mdash; real wiring is M2.3.</li>
+            <li>Accessibility: each button has <code>aria-label</code> with the full answer text + keyboard hint.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Visiting <code>/play</code> shows a fake question + functional buttons.</li>
+              <li>Pressing 1&ndash;5 dispatches answers.</li>
+              <li>Progress dots advance.</li>
+              <li>Reduced-motion users see instant transitions instead of cross-fades.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M2.3 -->
+      <div class="milestone" data-id="m2.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.3</span><span class="ms-title">Game state in Zustand + auto-resume</span></div>
+            <div class="ms-desc">Persisted store wired to the engine. Resume banner on landing.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>src/state/gameStore.ts</code> using Zustand + <code>persist</code> middleware writing to <code>localStorage</code> key <code>ca:game:v1</code>.</li>
+            <li>State shape: <code>{ status: 'idle'|'asking'|'guessing'|'wrong-guess'|'giveup'|'won'|'lost', belief, asked: Question[], answers: Answer[], guesses: string[], lastGuess: string|null, turn: number, missCount: number }</code>.</li>
+            <li>Actions: <code>startGame()</code>, <code>answer(a)</code>, <code>confirmGuess(yes)</code>, <code>reveal(charId)</code>, <code>giveUp()</code>, <code>reset()</code>.</li>
+            <li>Each action calls into <code>engine.decide()</code> to compute the next step and writes the result to state.</li>
+            <li>Replace M2.2&rsquo;s fake state with this real store.</li>
+            <li>On landing page, read the store at mount; if <code>status !== 'idle'</code> and <code>turn &gt; 0</code>, show a <code>&lt;ResumeBanner&gt;</code> with "Resume" + "Start over" buttons.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Mid-game refresh restores exact state.</li>
+              <li>Answering progresses the question stream from the real engine.</li>
+              <li>"Start over" clears the persisted slot.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M2.4 -->
+      <div class="milestone" data-id="m2.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.4</span><span class="ms-title">Guess reveal &amp; wrong-guess loop</span></div>
+            <div class="ms-desc">"Is it&hellip;?" with character art. Wrong &rarr; remove from belief &rarr; keep asking. 3 misses &rarr; give up.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>GuessReveal.tsx</code> &mdash; modal-style card with the suspect&rsquo;s image (with skeleton-loader + silhouette fallback), name, and Yes / No buttons.</li>
+            <li>"Yes" dispatches <code>confirmGuess(true)</code> &rarr; navigate to <code>/result/[gameId]</code>.</li>
+            <li>"No" dispatches <code>confirmGuess(false)</code> &rarr; belief mass for that character zeroed + renormalized, asked-list cleared of "already answered" guesses, return to question screen.</li>
+            <li>After 3 wrong guesses in the same game, redirect to <code>/give-up</code> (handled in M2.5).</li>
+            <li>Hard-cap of 25 questions still applies. If hit without confidence, route to give-up.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>End-to-end happy path works: play &rarr; guess &rarr; Yes &rarr; result page.</li>
+              <li>Wrong-guess loop works: play &rarr; guess &rarr; No &rarr; more questions &rarr; better guess.</li>
+              <li>3 wrong guesses routes to give-up.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M2.5 -->
+      <div class="milestone" data-id="m2.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.5</span><span class="ms-title">Give-up &amp; top-5 picker</span></div>
+            <div class="ms-desc">Top-5 grid + searchable "someone else" reveal + miss logged to local learning queue.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>/give-up</code> route reads the current belief, sorts by posterior, shows top 5 as a grid of character cards.</li>
+            <li>If user picks one &rarr; treat as a successful guess &rarr; <code>/result</code>.</li>
+            <li>"It was someone else" opens a <code>CharacterSearchModal</code> &mdash; fuzzy search (use <code>fuse.js</code> or simple <code>String.includes</code> &mdash; <code>fuse</code> is &lt;5 KB gzipped) over <code>characters.json</code> by name.</li>
+            <li>Once revealed, append to <code>localStorage</code> key <code>ca:misses:v1</code>: <code>{ gameId, characterId, asked: [...], answers: [...], at: ISOString }</code>. This is the Phase-2 learning queue seed.</li>
+            <li>Navigate to <code>/result</code> in "give-up" mode (different copy: "Got me. It was {name}").</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Top-5 grid renders 5 distinct characters.</li>
+              <li>Search modal finds Spider-Man typing "spider".</li>
+              <li>Misses persist across reloads in <code>localStorage</code>.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M2.6 -->
+      <div class="milestone" data-id="m2.6">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.6</span><span class="ms-title">Result screen</span></div>
+            <div class="ms-desc">Full character reveal, bio, stats, replay-link URL, share button placeholder.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~3h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>/result/[gameId]</code> &mdash; reads game record from <code>localStorage</code> key <code>ca:history:v1</code> (write the record from the gameStore at game-end).</li>
+            <li>History record shape: <code>{ id, characterId, questionCount, missCount, outcome: 'won'|'gaveup', at }</code>.</li>
+            <li>Layout: hero image + name + publisher + "Guessed in N questions" + 2-3 line bio paragraph from <code>characters.json</code>.</li>
+            <li>CTAs: "Play again" (resets store + routes to <code>/play</code>) and a Share button (stub for M3.1).</li>
+            <li>Unknown gameId &rarr; show a graceful "this game expired" page with Play-again CTA.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Win path lands here with correct character.</li>
+              <li>Give-up path lands here with revealed character + "Got me" copy.</li>
+              <li>Direct URL load works after refresh.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WEEK 3 -->
+  <section class="phase" data-phase="week3">
+    <div class="phase-head">
+      <span class="label">WEEK 3</span>
+      <h2 class="phase-title">Share, Polish, PWA, A11y</h2>
+      <span class="phase-meta">Goal: feels finished</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- M3.1 -->
+      <div class="milestone" data-id="m3.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.1</span><span class="ms-title">Server-side share image</span></div>
+            <div class="ms-desc"><code>@vercel/og</code> &rarr; 1200&times;630 PNG per game. Cached 30 days.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~5h</span><span class="badge badge-risk">virality driver</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>npm i @vercel/og</code> &mdash; no extra config needed on Vercel.</li>
+            <li>Create <code>src/app/api/share-image/route.tsx</code> with <code>export const runtime = 'edge'</code>.</li>
+            <li>Query params: <code>?c={characterId}&amp;n={questionCount}&amp;o={outcome}</code>. Validate with Zod.</li>
+            <li>Render template: dark comic gradient bg, character image (right), bold display "Guessed in {N}!" or "{character} stumped me!" copy (left), "Comic Akinator" wordmark bottom-right.</li>
+            <li>Cache: <code>headers: { 'Cache-Control': 'public, immutable, no-transform, s-maxage=2592000, stale-while-revalidate=86400' }</code>.</li>
+            <li>Wire the result page&rsquo;s <code>metadata</code> to set <code>og:image</code> and <code>twitter:image</code> pointing at the API URL with the right params.</li>
+            <li>Share button: try <code>navigator.share({ url, title })</code> first, fall back to clipboard copy of the result URL with a toast.</li>
+            <li>Validate by pasting a result URL into <a href="https://cards-dev.twitter.com/validator">cards-dev.twitter.com/validator</a>.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Direct API URL returns a 1200&times;630 PNG in &lt;500ms cold.</li>
+              <li>Twitter/X card preview renders correctly.</li>
+              <li>Share button works on iOS Safari + Android Chrome.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M3.2 -->
+      <div class="milestone" data-id="m3.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.2</span><span class="ms-title">PWA &amp; offline</span></div>
+            <div class="ms-desc">Manifest + service worker; dataset + shell cached; fully playable offline.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>npm i -D @ducanh2912/next-pwa</code> (actively maintained Next 15 fork) and wrap <code>next.config.ts</code>.</li>
+            <li>Create <code>public/manifest.json</code> with <code>name</code>, <code>short_name: "Akinator"</code>, dark theme color, maskable icons at 192 + 512.</li>
+            <li>Generate icons quickly with <a href="https://maskable.app">maskable.app</a> from a single SVG mark &mdash; export the set.</li>
+            <li>Service worker strategy: cache <code>characters.json</code>, fonts, app shell with <code>StaleWhileRevalidate</code>. Cache images with <code>CacheFirst</code> + 30-day expiration.</li>
+            <li>Add an <code>/api/dataset-version</code> endpoint returning the dataset checksum so the SW can swap in updates.</li>
+            <li>Test offline: Chrome DevTools &rarr; Application &rarr; Service Workers &rarr; check "Offline" &rarr; start a new game &rarr; should work.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Chrome shows install prompt on desktop + mobile.</li>
+              <li>Disabling network mid-game still lets you finish.</li>
+              <li>Updating the dataset and redeploying causes installed users to refresh on next launch.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M3.3 -->
+      <div class="milestone" data-id="m3.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.3</span><span class="ms-title">Animations &amp; Lottie reactions</span></div>
+            <div class="ms-desc">Framer page transitions, card flip on guess, particle burst, Lottie per-answer reactions.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Source Lottie JSONs from <a href="https://lottiefiles.com">lottiefiles.com</a> (free tier): "thinking" (default), "cheer" (yes/probably), "shrug" (don't know), "frown" (no/probably not). Save under <code>public/lottie/</code>.</li>
+            <li>Build <code>&lt;ReactionLottie answer={...} /&gt;</code> that swaps the JSON per last answer. Lazy-load via dynamic import to keep initial bundle thin.</li>
+            <li>Page transitions: <code>AnimatePresence</code> in a <code>template.tsx</code> wrapping each route with a slide+fade. 220ms duration; easing <code>cubic-bezier(.4,0,.2,1)</code>.</li>
+            <li>Guess reveal: card flip via Framer&rsquo;s <code>rotateY</code>; particle burst (CSS keyframed dots radiating out) on confirmed win.</li>
+            <li>Wrap every animation with a <code>useReducedMotion()</code> guard: if true, swap to instant transitions and a still Lottie frame.</li>
+            <li>Performance check: scroll-jank-test, FPS profile on a mid-tier Android. Keep frame budget &lt; 16 ms.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Every screen transition + reveal feels intentional.</li>
+              <li><code>prefers-reduced-motion</code> kills all motion cleanly &mdash; nothing breaks.</li>
+              <li>Animations don't regress Lighthouse Performance below 90.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M3.4 -->
+      <div class="milestone" data-id="m3.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.4</span><span class="ms-title">WCAG 2.1 AA pass</span></div>
+            <div class="ms-desc">Keyboard, ARIA, focus, contrast, reduced-motion verified.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Install <code>@axe-core/playwright</code> (already in M1.1) and add an a11y E2E test per screen: <code>await new AxeBuilder({ page }).analyze()</code> &mdash; assert 0 violations of <code>wcag2aa</code> tags.</li>
+            <li>Manual keyboard pass: Tab through every screen. Every interactive element reachable. Focus ring visible (style if needed).</li>
+            <li>Audit color contrast in DevTools "Contrast" picker. Anything &lt; 4.5:1 against background gets darkened/lightened until it passes.</li>
+            <li>Add ARIA labels on icon-only buttons. <code>role="status"</code> + <code>aria-live="polite"</code> on the "I'm thinking about N characters" hint.</li>
+            <li>Skip-to-content link for keyboard users at the top of <code>AppShell</code>.</li>
+            <li>Screen-reader smoke test with NVDA or VoiceOver: can you play a full game with eyes closed?</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>axe scans clean on all 6 screens.</li>
+              <li>Lighthouse Accessibility = 100.</li>
+              <li>Keyboard-only playthrough completes without trapping.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M3.5 -->
+      <div class="milestone" data-id="m3.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.5</span><span class="ms-title">Onboarding, empty &amp; error states</span></div>
+            <div class="ms-desc">First-run tutorial; empty history; fetch errors; offline-cache miss; global error boundary.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>First-run modal on <code>/</code>: 3 slides &mdash; how to play, the 5 answer choices, the give-up flow. Dismissible. Store <code>ca:seen-intro:v1</code> in <code>localStorage</code>.</li>
+            <li><code>/history</code> empty state: comic-style speech bubble "No games yet! Start playing &rarr;".</li>
+            <li>Dataset fetch error: if <code>characters.json</code> fails to load (somehow), show a retry card with cached-offline-mode fallback.</li>
+            <li>Offline cache-miss for an asset: graceful "we&rsquo;ll be back when you have signal" panel.</li>
+            <li>Next.js <code>error.tsx</code> + <code>global-error.tsx</code> with a Sentry capture + comic 500 panel.</li>
+            <li>Edge cases: zero-belief state (all characters eliminated), URL with invalid gameId, attempt to share before game ends.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Every error state has its own visual; nothing shows a default React error overlay.</li>
+              <li>Onboarding shows once per device.</li>
+              <li>Throwing a manual error mid-game lands on the styled error boundary.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M3.6 -->
+      <div class="milestone" data-id="m3.6">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M3.6</span><span class="ms-title">Local history page</span></div>
+            <div class="ms-desc">Last 20 games from <code>localStorage</code> with replay links.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~2h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Read <code>ca:history:v1</code> array. Cap at 20 entries; rotate oldest out on write in <code>gameStore</code>.</li>
+            <li>Render each as a card: character thumb, name, "Guessed in N" or "Stumped me", relative time ("3h ago" via <code>Intl.RelativeTimeFormat</code>, no extra dep).</li>
+            <li>Click &rarr; <code>/result/[gameId]</code>.</li>
+            <li>"Clear history" button with confirm.</li>
+            <li>Aggregate stats card at top: total games, win rate, average question count.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>After playing 5 games, history shows all 5.</li>
+              <li>Stats card is correct.</li>
+              <li>Replay links land on result pages.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WEEK 4 -->
+  <section class="phase" data-phase="week4">
+    <div class="phase-head">
+      <span class="label">WEEK 4</span>
+      <h2 class="phase-title">Test, Tune, Deploy, Launch</h2>
+      <span class="phase-meta">Goal: live on the internet</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- M4.1 -->
+      <div class="milestone" data-id="m4.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.1</span><span class="ms-title">Hit simulation harness target</span></div>
+            <div class="ms-desc">&ge;85% accuracy at &le;22 avg questions on the 500-character MVP set.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h (iterative)</span><span class="badge badge-risk">tuning</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Run <code>npm run sim</code> &mdash; check baseline from M1.5.</li>
+            <li>Look at the top-20 failures. Are they failing because of <strong>(a)</strong> sparse trait data, <strong>(b)</strong> ambiguous questions, or <strong>(c)</strong> the engine not driving enough info-gain from available traits?</li>
+            <li>For (a): backfill trait values for those specific characters in <code>characters.json</code>.</li>
+            <li>For (b): rewrite the offending question or add a sharper alternative; bump <code>cost</code> of the ambiguous one.</li>
+            <li>For (c): tune the diversity penalty (try 0.8 &harr; 0.9) and the guess threshold parameters.</li>
+            <li>Iterate. Commit a sim report alongside any tuning change so you can see the curve.</li>
+            <li>Add a CI step (GitHub Actions) running <code>npm run sim -- --ci</code> that exits nonzero if accuracy regresses by &gt;3% from <code>sim-report.json</code> on main.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>&ge;85% accuracy and &le;22 avg questions on the 500-char set with noise=0.</li>
+              <li>&ge;75% / &le;24 with noise=0.1.</li>
+              <li>CI regression gate is live.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M4.2 -->
+      <div class="milestone" data-id="m4.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.2</span><span class="ms-title">Playwright E2E suite</span></div>
+            <div class="ms-desc">Happy path, give-up, share, resume, offline. All green in CI.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~5h</span></p>
+
+          <h4>Specs to write</h4>
+          <ul>
+            <li><code>e2e/happy-path.spec.ts</code> &mdash; play through, answer Yes to guess, see result, share button visible.</li>
+            <li><code>e2e/give-up.spec.ts</code> &mdash; force engine to fail (mock belief), trigger give-up, pick top-5 character, land on result.</li>
+            <li><code>e2e/resume.spec.ts</code> &mdash; start game, navigate away, return &rarr; resume banner appears.</li>
+            <li><code>e2e/share-image.spec.ts</code> &mdash; <code>page.request.get('/api/share-image?c=spider-man&amp;n=12&amp;o=won')</code> returns PNG bytes &gt; 50KB.</li>
+            <li><code>e2e/offline.spec.ts</code> &mdash; <code>context.setOffline(true)</code>, refresh, game still playable.</li>
+            <li><code>e2e/a11y.spec.ts</code> &mdash; axe scan on each route.</li>
+          </ul>
+
+          <h4>CI</h4>
+          <ol>
+            <li>GitHub Actions workflow <code>.github/workflows/ci.yml</code>: install &rarr; build &rarr; unit &rarr; e2e (chromium + webkit) &rarr; sim regression.</li>
+            <li>Upload Playwright traces on failure for debugging.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>All 6 E2E specs green locally + in CI.</li>
+              <li>CI takes &lt; 5 min total.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M4.3 -->
+      <div class="milestone" data-id="m4.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.3</span><span class="ms-title">Lighthouse 90+ across the board</span></div>
+            <div class="ms-desc">Perf, A11y, Best-Practices, SEO &ge; 90 on <code>/</code> and <code>/play</code>.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Tactics</h4>
+          <ul>
+            <li><strong>Images:</strong> use <code>next/image</code> for character art with width/height set; preload only the current-question hint image.</li>
+            <li><strong>Fonts:</strong> <code>display: swap</code> + only Bangers 400 weight loaded.</li>
+            <li><strong>JS bundle:</strong> dynamic-import Framer Motion + Lottie + fuse.js; verify with <code>@next/bundle-analyzer</code>. Target &lt; 200 KB JS gzipped.</li>
+            <li><strong>SEO:</strong> proper <code>title</code> + <code>description</code> per route, Open Graph tags, canonical URL, <code>sitemap.xml</code> + <code>robots.txt</code>.</li>
+            <li><strong>Best Practices:</strong> CSP headers via <code>next.config.ts</code>, no console errors, HTTPS only (Vercel default).</li>
+          </ul>
+
+          <h4>Verify</h4>
+          <ol>
+            <li>Add <code>@lhci/cli</code>: <code>npm i -D @lhci/cli</code>.</li>
+            <li>GitHub Actions job runs <code>lhci autorun</code> against the preview deploy on each PR.</li>
+            <li>Fail the build if any category &lt; 90.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>All 4 Lighthouse categories &ge; 90 on <code>/</code> and <code>/play</code>.</li>
+              <li>TTFQ &lt; 1s on simulated Fast 3G.</li>
+              <li>LHCI gates active in CI.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M4.4 -->
+      <div class="milestone" data-id="m4.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.4</span><span class="ms-title">Umami (free) + Sentry (free) wired</span></div>
+            <div class="ms-desc">Events on game-start, end, share, miss. Sentry catches client errors.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~2h</span></p>
+
+          <h4>Umami (free Cloud hobby tier &mdash; 10k events/mo)</h4>
+          <ol>
+            <li>Sign up at <a href="https://cloud.umami.is">cloud.umami.is</a>, create a website, copy the <code>data-website-id</code>.</li>
+            <li>Add the script tag to <code>layout.tsx</code> (no cookies, GDPR-friendly).</li>
+            <li>Emit custom events via <code>umami.track('event_name', { props })</code>: <code>game_start</code>, <code>game_end</code> (with <code>outcome</code>, <code>question_count</code>), <code>share_click</code>, <code>character_miss</code> (with <code>character_id</code>).</li>
+            <li>Confirm events arriving in the Umami dashboard.</li>
+          </ol>
+
+          <h4>Sentry (free Developer tier)</h4>
+          <ol>
+            <li>Sign up at <a href="https://sentry.io">sentry.io</a> &mdash; choose "Next.js".</li>
+            <li><code>npx @sentry/wizard@latest -i nextjs</code> &mdash; it scaffolds <code>sentry.client.config.ts</code>, <code>sentry.server.config.ts</code>, <code>sentry.edge.config.ts</code>.</li>
+            <li>Set <code>tracesSampleRate</code> low (0.1) so we don&rsquo;t blow the free quota (5k errors + limited perf events/mo).</li>
+            <li>Add a <code>/debug-throw</code> route in dev only that throws on render &mdash; visit to verify Sentry catches it.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Umami dashboard shows a real game-end event from your own test.</li>
+              <li>Sentry captures a forced throw with stack trace + source maps.</li>
+              <li>Neither hits a paid tier; both are confirmed free.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M4.5 -->
+      <div class="milestone" data-id="m4.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.5</span><span class="ms-title">Legal: disclaimer + privacy page</span></div>
+            <div class="ms-desc">Footer + <code>/privacy</code>. No cookie banner needed.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~2h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>AppShell</code> footer: "Comic Akinator is an unofficial fan project. Marvel and DC characters are property of their respective owners. No affiliation."</li>
+            <li><code>/privacy</code> page in plain language: what's stored locally (game state, history, miss queue), what's sent to Umami (page views + 4 custom events, no PII), what's sent to Sentry (error stack traces + browser metadata, no PII).</li>
+            <li><code>/about</code> page lists data sources + credits (Kaggle, Superhero API, Wikipedia, Fandom, LottieFiles).</li>
+            <li>No cookie banner required: Umami is cookieless; Sentry uses no advertising IDs; <code>localStorage</code> is first-party functional storage and exempt under GDPR ePrivacy.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>Disclaimer visible site-wide.</li>
+              <li><code>/privacy</code> and <code>/about</code> reachable from the footer.</li>
+              <li>You&rsquo;ve read the privacy text top-to-bottom and it's accurate.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- M4.6 -->
+      <div class="milestone" data-id="m4.6">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M4.6</span><span class="ms-title">Deploy to Vercel &amp; ship</span></div>
+            <div class="ms-desc">Live at <code>comic-akinator.vercel.app</code> with preview deploys on PRs.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~2h</span><span class="badge badge-risk">launch day</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Sign in to <a href="https://vercel.com">vercel.com</a> with GitHub. Free Hobby plan.</li>
+            <li>Import the <code>comic-akinator</code> repo. Framework auto-detected as Next.js.</li>
+            <li>Project name: <code>comic-akinator</code> &rarr; production URL <code>comic-akinator.vercel.app</code>.</li>
+            <li>Add env vars in Vercel UI: <code>NEXT_PUBLIC_SITE_URL</code> = production URL, <code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</code>, <code>SENTRY_DSN</code>, <code>SENTRY_AUTH_TOKEN</code> (for source-map upload during build, scope to org+project only).</li>
+            <li>Verify preview deploys: open a draft PR &rarr; check the auto-generated preview URL works.</li>
+            <li>Smoke test production: play 3 games on phone + desktop. Share to your own Twitter/X and confirm card renders.</li>
+            <li>Tag the release: <code>git tag v1.0.0 &amp;&amp; git push --tags</code>.</li>
+            <li>Add the live URL to the GitHub repo About + README.</li>
+            <li>Update memory: production URL is live.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li><code>comic-akinator.vercel.app</code> serves the production build.</li>
+              <li>Drafting a PR produces a working preview URL.</li>
+              <li>You&rsquo;ve played and shared from a real phone.</li>
+              <li>v1.0.0 tagged on GitHub.</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================== PHASE 2 ====================== -->
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="title">PHASE 2 &middot; v1.1&ndash;1.5</div>
+    <div class="line"></div>
+  </div>
+
+  <section class="phase" data-phase="phase2">
+    <div class="phase-head">
+      <span class="label">PHASE 2</span>
+      <h2 class="phase-title">Scale &amp; Sustain</h2>
+      <span class="phase-meta">Post-MVP &middot; ongoing</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- P2.1 -->
+      <div class="milestone" data-id="p2.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.1</span><span class="ms-title">Expand dataset to 3000+ characters</span></div>
+            <div class="ms-desc">The headline Phase 2 goal &mdash; enrich the long tail without hurting engine accuracy.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~20h</span><span class="badge badge-risk">important</span></p>
+
+          <h4>Strategy</h4>
+          <p>The MVP shipped 500 well-traited characters. Adding 2500 more with sparse traits will hurt engine accuracy unless we&rsquo;re careful. The plan is to enrich in waves and gate each by simulation.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><strong>Wave A &mdash; tier 2 popularity (next 500):</strong> Extend <code>build-dataset.ts</code> to take the next-most-popular 500 characters from Superhero API + Kaggle. Run sim &mdash; expect a 5&ndash;10pt accuracy drop.</li>
+            <li><strong>Trait backfill from Fandom infoboxes:</strong> Build <code>scripts/enrich-from-fandom.ts</code>. For each character with &lt; 12 known traits, fetch their Fandom page, parse the infobox HTML, map fields to your traits.</li>
+            <li><strong>Wave B &mdash; long tail (2000 more):</strong> Add the remainder. Mark them as <code>tier: 'deep_cut'</code>.</li>
+            <li><strong>Difficulty toggle on landing:</strong> "Just the famous ones" (tier 1, default) vs "Include deep cuts" (all tiers). Filter the engine&rsquo;s pool at game start.</li>
+            <li><strong>Re-tune costs:</strong> Some questions that worked at 500 chars will be weaker at 3000 &mdash; re-run M4.1&rsquo;s tuning loop.</li>
+            <li><strong>Image pipeline cost:</strong> 3000 hot-linked images is fine; Wikipedia handles it. If Fandom rate-limits, fall back to silhouettes.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong></p>
+            <ul>
+              <li>3000+ characters live in <code>characters.json</code>.</li>
+              <li>Sim: &ge;85% on tier 1 (unchanged from MVP), &ge;65% on full pool.</li>
+              <li>Difficulty toggle works.</li>
+              <li>Bundle size still acceptable (move dataset to a separate <code>/data</code> fetch if it grows past 1 MB).</li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- P2.2 -->
+      <div class="milestone" data-id="p2.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.2</span><span class="ms-title">Daily Challenge mode</span></div>
+            <div class="ms-desc">Same character for everyone each day. Wordle-style share grid.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~8h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Daily seed: <code>YYYY-MM-DD</code> &rarr; hash &rarr; pick character from tier 1 pool (deterministic, no server state needed).</li>
+            <li>Reverse mode: the user thinks they know who it is &mdash; they answer the engine's questions as that character would &mdash; the engine guesses. (Slightly different framing than classic.)</li>
+            <li>Wordle-style result share: emoji grid mapping each answer (&#x1F7E9;=Yes, &#x1F7E8;=Probably, &#x2B1C;=DK, &#x1F7E5;=Probably-not, &#x1F7EB;=No), question count, link.</li>
+            <li>"Played today" lockout via <code>localStorage</code>.</li>
+            <li>Past-day archive (rolling 30 days) for replay.</li>
+          </ol>
+
+          <div class="accept">
+            <p><strong>Done when:</strong> Daily routes work, share grid matches Wordle&rsquo;s feel, no two users see different characters on the same day.</p>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- P2.3 -->
+      <div class="milestone" data-id="p2.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.3</span><span class="ms-title">Themed packs</span></div>
+            <div class="ms-desc">X-Men only, Bat-Family, MCU only, animated only.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~4h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Define packs in <code>data/packs.json</code>: <code>{ id, name, filter: { teams?, adaptations?, publishers? } }</code>.</li>
+            <li>Landing page tile grid for pack selection.</li>
+            <li>Engine accepts an optional <code>poolFilter</code> at game start; everything else stays the same.</li>
+            <li>Per-pack stats in history.</li>
+            <li>Re-tune sim per pack &mdash; some small packs may need fewer questions on average.</li>
+          </ol>
+        </div></div>
+      </div>
+
+      <!-- P2.4 -->
+      <div class="milestone" data-id="p2.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.4</span><span class="ms-title">Admin CMS</span></div>
+            <div class="ms-desc">Edit traits + characters without touching the repo. Free tier of LibSQL/Turso.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~12h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Install Payload CMS in the same Next project. Storage: LibSQL via Turso (free tier: 9 GB, plenty).</li>
+            <li>Import existing <code>characters.json</code> into the DB once via a migration script.</li>
+            <li>Build admin schema mirroring the character + trait + question shapes.</li>
+            <li>Password-gated <code>/admin</code> route. Single admin user, env-var password hash. No public signup.</li>
+            <li>On save, re-export DB &rarr; <code>characters.json</code> via a build hook so production stays a static bundle.</li>
+            <li>Verify Turso usage stays under free quota with current traffic.</li>
+          </ol>
+        </div></div>
+      </div>
+
+      <!-- P2.5 -->
+      <div class="milestone" data-id="p2.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.5</span><span class="ms-title">Suggestion form + admin-review queue</span></div>
+            <div class="ms-desc">User submissions land in DB, you approve/reject from <code>/admin</code>.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li><code>/suggest</code> route with a form: character name, "wrong trait" + "correct value", optional email.</li>
+            <li>Server action writes to a <code>suggestions</code> table.</li>
+            <li>Resend free tier (3000 emails/mo) emails you on each submission.</li>
+            <li>Admin queue UI: approve &rarr; auto-apply the trait change. Reject &rarr; mark closed.</li>
+            <li>Rate-limit by IP via Vercel KV free tier (also has a free quota) or a simple in-memory map in serverless &mdash; pick whichever stays free.</li>
+          </ol>
+        </div></div>
+      </div>
+
+      <!-- P2.6 -->
+      <div class="milestone" data-id="p2.6">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P2.6</span><span class="ms-title">Learning queue dashboard</span></div>
+            <div class="ms-desc">Locally-logged misses + admin-curated suggestions feed weight tuning.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~6h</span></p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Add an opt-in toggle ("share my misses to improve the game") on the result page when a game is lost.</li>
+            <li>If on, <code>POST /api/log-miss</code> writes to the DB with no PII.</li>
+            <li>Admin dashboard view: top-missed characters, common question paths that lead to give-up.</li>
+            <li>For each, a one-click "open in trait editor" action to fix data quickly.</li>
+            <li>Run sim after each batch to confirm regressions don&rsquo;t sneak in.</li>
+          </ol>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================== PHASE 3 ====================== -->
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="title">PHASE 3 &middot; LONG TERM</div>
+    <div class="line"></div>
+  </div>
+
+  <section class="phase" data-phase="phase3">
+    <div class="phase-head">
+      <span class="label">PHASE 3</span>
+      <h2 class="phase-title">Stretch Goals</h2>
+      <span class="phase-meta">If &amp; when</span>
+      <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
+    </div>
+    <div class="phase-body">
+
+      <!-- P3.1 -->
+      <div class="milestone" data-id="p3.1">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P3.1</span><span class="ms-title">Teams as first-class entities</span></div>
+            <div class="ms-desc">Avengers, JLA, X-Men, Bat-Family become guessable.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <h4>Sketch</h4>
+          <ol>
+            <li>Introduce an <code>entityType: 'character' | 'team'</code> dimension.</li>
+            <li>Team-specific traits: founding era, headquarters, leader, membership scale.</li>
+            <li>Engine adds an early-branch question: <em>"Are you thinking of a group of heroes, not a single person?"</em></li>
+            <li>Pool split / re-rank at game start.</li>
+          </ol>
+        </div></div>
+      </div>
+
+      <!-- P3.2 -->
+      <div class="milestone" data-id="p3.2">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P3.2</span><span class="ms-title">Two-player pass-and-play</span></div>
+            <div class="ms-desc">One thinks, the other watches.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <h4>Sketch</h4>
+          <p>Pure client-side. Player A picks a character on a private screen (their phone), passes the device to Player B. The engine asks B questions; B watches as the engine tries to guess what A is thinking. Rewards correct calls; tracks streaks.</p>
+        </div></div>
+      </div>
+
+      <!-- P3.3 -->
+      <div class="milestone" data-id="p3.3">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P3.3</span><span class="ms-title">ML-tuned trait weights</span></div>
+            <div class="ms-desc">Offline batch job over the learning queue.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <h4>Sketch</h4>
+          <p>Collect a corpus of complete games (answers + revealed character). Fit per-character trait certainties by minimizing simulated mis-guess rate via gradient descent on the trait matrix. Run in CI weekly. Output: a new <code>characters.json</code> diff for review. No runtime ML &mdash; the engine stays simple and explainable.</p>
+        </div></div>
+      </div>
+
+      <!-- P3.4 -->
+      <div class="milestone" data-id="p3.4">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P3.4</span><span class="ms-title">Optional accounts</span></div>
+            <div class="ms-desc">Auth.js + GitHub OAuth for cloud-synced history.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <h4>Sketch</h4>
+          <p>Only worth doing if there&rsquo;s real demand. Auth.js + GitHub OAuth (free) + Turso for sync. History + daily streak migrates from <code>localStorage</code> on first sign-in. Anonymous play remains the default.</p>
+        </div></div>
+      </div>
+
+      <!-- P3.5 -->
+      <div class="milestone" data-id="p3.5">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">P3.5</span><span class="ms-title">Custom domain</span></div>
+            <div class="ms-desc">The one paid step ever considered &mdash; needs your sign-off.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <h4>Sketch</h4>
+          <p>If the project earns it (real traffic, portfolio interview asks for it), graduate from <code>comic-akinator.vercel.app</code> to a real domain. Cost: ~$10&ndash;15/yr. Would be the only paid line item in the project budget &mdash; needs explicit go from you given the $0 constraint.</p>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>Click any tile to expand details &middot; check the box to mark done &middot; progress lives in <code>localStorage</code> under <code>ca:plan:v1</code>.</p>
+    <p>&copy; Comic Akinator &middot; Fan project. Marvel and DC characters belong to their respective owners.</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  var STORAGE_KEY = 'ca:plan:v1';
+  var EXPANDED_KEY = 'ca:plan:expanded:v1';
+  var allMs = document.querySelectorAll('.milestone');
+  var fill = document.getElementById('fill');
+  var pctEl = document.getElementById('pct');
+  var doneCountEl = document.getElementById('done-count');
+  var totalCountEl = document.getElementById('total-count');
+  var pow = document.getElementById('pow');
+  var resetBtn = document.getElementById('reset');
+  var expandAllBtn = document.getElementById('expand-all');
+
+  totalCountEl.textContent = allMs.length;
+
+  function load(key) {
+    try { return JSON.parse(localStorage.getItem(key) || '{}'); }
+    catch(e) { return {}; }
+  }
+  function save(key, state) {
+    try { localStorage.setItem(key, JSON.stringify(state)); }
+    catch(e) {}
+  }
+
+  var doneState = load(STORAGE_KEY);
+  var expandState = load(EXPANDED_KEY);
+  var prevPct = -1;
+
+  function render() {
+    var doneTotal = 0;
+    var phaseStats = {};
+
+    allMs.forEach(function(ms) {
+      var id = ms.dataset.id;
+      var checked = !!doneState[id];
+      var expanded = !!expandState[id];
+      ms.classList.toggle('done', checked);
+      ms.classList.toggle('expanded', expanded);
+
+      var phase = ms.closest('.phase').dataset.phase;
+      if (!phaseStats[phase]) phaseStats[phase] = { done: 0, total: 0 };
+      phaseStats[phase].total++;
+      if (checked) { phaseStats[phase].done++; doneTotal++; }
+    });
+
+    Object.keys(phaseStats).forEach(function(phase) {
+      var s = phaseStats[phase];
+      var phaseEl = document.querySelector('.phase[data-phase="' + phase + '"]');
+      var fillEl = phaseEl.querySelector('.phase-mini-fill');
+      var ratio = s.total ? (s.done / s.total) : 0;
+      fillEl.style.width = (ratio * 100) + '%';
+      phaseEl.classList.toggle('completed', ratio === 1);
+    });
+
+    var pct = Math.round((doneTotal / allMs.length) * 100);
+    fill.style.width = pct + '%';
+    pctEl.textContent = pct + '%';
+    doneCountEl.textContent = doneTotal;
+
+    if (pct === 100 && prevPct !== 100 && prevPct !== -1) {
+      celebrate('WIN!');
+    }
+    prevPct = pct;
+  }
+
+  function celebrate(text) {
+    pow.textContent = text;
+    pow.classList.add('show');
+    setTimeout(function() { pow.classList.remove('show'); }, 1100);
+  }
+
+  allMs.forEach(function(ms) {
+    var id = ms.dataset.id;
+
+    ms.querySelector('[data-toggle="check"]').addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (doneState[id]) { delete doneState[id]; }
+      else {
+        doneState[id] = true;
+        var phase = ms.closest('.phase');
+        var phaseMs = phase.querySelectorAll('.milestone');
+        var allDoneNow = Array.prototype.every.call(phaseMs, function(p) {
+          return doneState[p.dataset.id];
+        });
+        if (allDoneNow) celebrate('POW!');
+      }
+      save(STORAGE_KEY, doneState);
+      render();
+    });
+
+    ms.querySelectorAll('[data-toggle="expand"]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (expandState[id]) { delete expandState[id]; }
+        else { expandState[id] = true; }
+        save(EXPANDED_KEY, expandState);
+        render();
+      });
+    });
+  });
+
+  resetBtn.addEventListener('click', function() {
+    if (!confirm('Wipe all progress?')) return;
+    doneState = {};
+    save(STORAGE_KEY, doneState);
+    render();
+  });
+
+  expandAllBtn.addEventListener('click', function() {
+    var anyClosed = Array.prototype.some.call(allMs, function(ms) {
+      return !expandState[ms.dataset.id];
+    });
+    expandState = {};
+    if (anyClosed) {
+      allMs.forEach(function(ms) { expandState[ms.dataset.id] = true; });
+      expandAllBtn.textContent = 'Collapse All';
+    } else {
+      expandAllBtn.textContent = 'Expand All';
+    }
+    save(EXPANDED_KEY, expandState);
+    render();
+  });
+
+  render();
+  prevPct = parseInt(pctEl.textContent, 10);
+
+  var initialAnyExpanded = Object.keys(expandState).length > 0;
+  expandAllBtn.textContent = initialAnyExpanded ? 'Collapse All' : 'Expand All';
+})();
+</script>
+</body>
+</html>
