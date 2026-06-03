@@ -544,41 +544,66 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M1.2</span><span class="ms-title">Data pipeline script</span></div>
-            <div class="ms-desc">Merge Kaggle + Superhero API + Fandom thumbnails into a deduped <code>characters.json</code>.</div>
+            <div class="ms-desc">Merge FiveThirtyEight CSVs + Superhero API JSON into a deduped <code>characters.json</code>. Disk-only, no live fetches.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~6h</span><span class="badge badge-risk">data risk</span></p>
+          <p><span class="badge badge-time">~3h</span><span class="badge badge-risk">data risk</span></p>
 
           <h4>Goal</h4>
-          <p>One offline script that produces a canonical <code>data/characters.json</code> from public sources. Everything downstream &mdash; the engine, the UI, the sim &mdash; reads from this file.</p>
+          <p>One offline script that produces a canonical <code>data/characters.json</code> from three pre-downloaded source files. Everything downstream &mdash; the engine, the UI, the sim &mdash; reads from this file. The pipeline never touches the network: all sources are downloaded once by the user (sidesteps corp-SSL inspection).</p>
 
-          <h4>Sources (all free, no key)</h4>
+          <h4>Sources (all free, no account, no key)</h4>
           <ul>
-            <li><strong>Kaggle Marvel + DC characters CSV</strong> &mdash; download once, save to <code>scripts/sources/kaggle-marvel.csv</code> and <code>kaggle-dc.csv</code>. Gives alignment, gender, eye/hair color, publisher, year of first appearance.</li>
-            <li><strong>Superhero API JSON dump</strong> &mdash; pull from <code>https://akabab.github.io/superhero-api/api/all.json</code>. 731 characters with powerstats, biography, appearance, work, connections. Save to <code>scripts/sources/superhero-api.json</code>.</li>
-            <li><strong>Fandom / Wikipedia thumbnails</strong> &mdash; resolve image URLs by querying Wikipedia REST <code>/page/summary/{name}</code> (free, no key). Cache results to <code>scripts/sources/image-cache.json</code> so re-runs are fast.</li>
+            <li><strong>FiveThirtyEight Marvel CSV</strong> &mdash; <a href="https://raw.githubusercontent.com/fivethirtyeight/data/master/comic-characters/marvel-wikia-data.csv">raw.githubusercontent.com/.../marvel-wikia-data.csv</a> &rarr; save to <code>scripts/sources/marvel.csv</code>. Provides identity, alignment, gender, eye/hair colour, first-appearance year, comic-appearance count.</li>
+            <li><strong>FiveThirtyEight DC CSV</strong> &mdash; <a href="https://raw.githubusercontent.com/fivethirtyeight/data/master/comic-characters/dc-wikia-data.csv">raw.githubusercontent.com/.../dc-wikia-data.csv</a> &rarr; save to <code>scripts/sources/dc.csv</code>.</li>
+            <li><strong>Superhero API JSON dump</strong> &mdash; <a href="https://akabab.github.io/superhero-api/api/all.json">akabab.github.io/superhero-api/api/all.json</a> &rarr; save to <code>scripts/sources/superhero-api.json</code>. 731 characters with powerstats, biography, appearance, work, connections, and an embedded <code>image.url</code>. Images come from this source &mdash; no Wikipedia lookups, no extra HTTPS calls in the pipeline.</li>
           </ul>
+          <p>The original plan called for Kaggle + Wikipedia image lookups. Both required either an account or ~500 live HTTPS calls (which the corp SSL filter intercepts). FiveThirtyEight is the same comic-characters data Kaggle hosts but free on GitHub; Superhero API's embedded image URLs cover every shipped character for MVP. Phase 2 can swap in Wikipedia thumbnails if image URL rot becomes an issue.</p>
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Create <code>scripts/sources/</code> directory and download the three sources once. Commit the CSV/JSON; do NOT commit <code>image-cache.json</code> initially &mdash; let it rebuild.</li>
-            <li>Install pipeline-only deps: <code>npm i -D tsx csv-parse</code></li>
-            <li>Build <code>scripts/lib/normalize.ts</code> with the canonical schema and helpers: <code>slugify(name)</code>, <code>dedupeKey(realName, publisher)</code>.</li>
-            <li>Build <code>scripts/build-dataset.ts</code> doing in order: <strong>(a)</strong> load CSV + JSON sources &rarr; <strong>(b)</strong> normalize each into a partial <code>Character</code> &rarr; <strong>(c)</strong> merge on dedupeKey, preferring richer fields &rarr; <strong>(d)</strong> resolve image URLs via Wikipedia (with cache + 300ms rate-limit between requests) &rarr; <strong>(e)</strong> compute a <code>traitCompleteness</code> score per character &rarr; <strong>(f)</strong> select top 500 by completeness &times; popularity &rarr; <strong>(g)</strong> write to <code>data/characters.json</code>.</li>
-            <li>Build <code>scripts/validate-dataset.ts</code>: assert every character has id, name, publisher, image, &ge; 8 non-null traits. Exit nonzero on violation (this gates <code>npm run build</code>).</li>
-            <li>Run <code>npm run dataset:build</code>. Inspect output. Spot-check 10 random characters &mdash; do real names + publishers + images match?</li>
-            <li>Commit <code>data/characters.json</code> (it is the source of truth for the app, not a build artifact).</li>
+            <li>Create <code>scripts/sources/</code> and download the 3 files above into it (right-click &rarr; Save link as, or wget from a non-corp machine). Commit them &mdash; they&rsquo;re part of the build, not artifacts.</li>
+            <li>Install the one new dep: <code>npm i -D csv-parse</code></li>
+            <li>Build <code>scripts/lib/normalize.ts</code> with the canonical <code>Character</code> type and helpers: <code>slugify()</code>, <code>dedupeKey()</code>, <code>normalizePublisher()</code>, <code>normalizeAlignment()</code>, <code>normalizeGender()</code>, <code>normalizeIdentity()</code>, <code>parseYear()</code>, <code>cleanString()</code>, <code>cleanNumber()</code>, <code>countTraits()</code>. All sources funnel through these so the schema stays uniform.</li>
+            <li>Build <code>scripts/build-dataset.ts</code>: <strong>(a)</strong> load Superhero API, filter to Marvel/DC entries with an image &rarr; <strong>(b)</strong> load FiveThirtyEight CSVs into lookup maps keyed by <code>dedupeKey(name)</code> &rarr; <strong>(c)</strong> for each Superhero entry, merge in matching FT row to fill <code>appearances</code>, <code>yearFirstAppeared</code>, <code>identity</code>, and any missing alignment/gender/eye/hair &rarr; <strong>(d)</strong> dedupe by <code>id</code>, keeping the richer entry &rarr; <strong>(e)</strong> score completeness = populated trait count / 15 &rarr; <strong>(f)</strong> select top 500 by <code>completeness &times; (1 + log10(appearances + 1))</code> &rarr; <strong>(g)</strong> write to <code>data/characters.json</code>.</li>
+            <li>Build <code>scripts/validate-dataset.ts</code>: assert array of &ge;400 entries, every one has id + name + publisher + image + &ge;8 non-null traits, no duplicate ids, publisher is Marvel or DC. Exit nonzero on violation (this gates <code>npm run build</code>).</li>
+            <li>Run <code>npm run dataset:build</code>. Read the stdout report &mdash; min/avg/max completeness, Marvel/DC split, top 10 by appearances, any famous-hero misses.</li>
+            <li>Commit <code>data/characters.json</code> (the source of truth for the app, not a build artifact).</li>
+          </ol>
+
+          <h4>Files touched</h4>
+          <ul>
+            <li><code>scripts/sources/marvel.csv</code>, <code>dc.csv</code>, <code>superhero-api.json</code> (downloaded by user)</li>
+            <li><code>scripts/lib/normalize.ts</code> &mdash; schema + helpers</li>
+            <li><code>scripts/build-dataset.ts</code>, <code>scripts/validate-dataset.ts</code></li>
+            <li><code>data/characters.json</code> (generated, committed)</li>
+          </ul>
+
+          <h4>Testing</h4>
+          <ol>
+            <li><strong>Run:</strong> <code>npm run dataset:build</code></li>
+            <li><strong>Look for:</strong> stdout reports loading Superhero API + both FiveThirtyEight CSVs, augmentation count, then <code>Wrote ~500 characters to data/characters.json</code>. No stack traces.</li>
+            <li><strong>Look for:</strong> the <code>completeness</code> summary line &mdash; avg should be &ge; 70%. If it&rsquo;s much lower, the FiveThirtyEight merge is misaligned (check that you saved as <code>marvel.csv</code> / <code>dc.csv</code>, not e.g. <code>marvel-wikia-data.csv</code>).</li>
+            <li><strong>Look for:</strong> the <code>top 10 by appearances</code> list &mdash; should include Spider-Man, Batman, Superman, Iron Man, Wolverine, or similar. If you see deep cuts like &ldquo;A-Bomb&rdquo; or &ldquo;Agent 13&rdquo; topping the list, the merge with FiveThirtyEight failed.</li>
+            <li><strong>Look for:</strong> the <code>heads-up: N canonical heroes not in final set</code> line &mdash; should say &ldquo;all canonical top heroes present&rdquo; or list at most 1&ndash;2 misses.</li>
+            <li><strong>Run:</strong> <code>npm run dataset:validate</code></li>
+            <li><strong>Look for:</strong> exit 0 with <code>validate-dataset: N characters OK</code>. Nonzero with a numbered list of violations means the build is shipping bad data.</li>
+            <li><strong>Run:</strong> open <code>data/characters.json</code> in your editor; search for &ldquo;Spider-Man&rdquo;, &ldquo;Batman&rdquo;, &ldquo;Wonder Woman&rdquo;.</li>
+            <li><strong>Look for:</strong> each entry has a populated <code>image</code> field (URL), at least 8 non-null trait fields, sane <code>publisher</code> + <code>alignment</code>.</li>
+            <li><strong>Run:</strong> pick 5 random <code>image</code> URLs from the JSON and paste them into your browser.</li>
+            <li><strong>Look for:</strong> the image loads. If 1&ndash;2 are broken (URL rot at the source), tolerable for MVP. If most are broken, the Superhero API JSON is stale &mdash; redownload.</li>
+            <li><strong>Red flag:</strong> fewer than 400 entries, validation exits nonzero, top-10-by-appearances is all unknowns, or completeness avg below 50%.</li>
           </ol>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
               <li><code>data/characters.json</code> exists with ~500 entries.</li>
-              <li>Every entry has a working image URL and &ge; 8 populated traits.</li>
+              <li>Every entry has a populated image URL and &ge;8 non-null traits.</li>
               <li><code>npm run dataset:validate</code> exits zero.</li>
-              <li>Top 50 most-popular Marvel/DC heroes are all present (Spider-Man, Batman, Superman, Iron Man, Wonder Woman, &hellip;).</li>
+              <li>Top-10-by-appearances list contains recognizable mainstream Marvel/DC heroes.</li>
             </ul>
           </div>
         </div></div>
