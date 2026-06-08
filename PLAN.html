@@ -715,7 +715,7 @@
             <li><strong>Run:</strong> <code>npx tsx scripts/checks/entropy.ts</code></li>
             <li><strong>Look for:</strong> <code>entropy(uniform over N) = X.XX (expected ~log2(N) = Y.YY)</code> &mdash; the two numbers should agree to two decimal places.</li>
             <li><strong>Run:</strong> <code>npx tsx scripts/checks/posterior.ts</code></li>
-            <li><strong>Look for:</strong> after a Yes to a trait where exactly one character has value 1.0, that character&rsquo;s posterior prints as &gt;0.99 and the rest are near zero. Belief vector sum prints as 1.0.</li>
+            <li><strong>Look for:</strong> synthetic 3-character test &mdash; alice (the only one with the trait) gets posterior ~0.905 (the math ceiling for a single update with our 19:1 likelihood ratio), bob and carol get ~0.048 each. Sum is 1.0. The dominance ratio between alice and the others is &gt;10x.</li>
             <li><strong>Run:</strong> <code>npx tsx scripts/checks/info-gain.ts</code></li>
             <li><strong>Look for:</strong> with a deliberately 50/50 Marvel/DC pool, the chosen next question has trait <code>universe-marvel</code> or <code>universe-dc</code> (these have maximal expected info-gain in that setup).</li>
             <li><strong>Run:</strong> <code>npx tsx scripts/checks/full-game.ts spider-man</code> (auto-plays a single character end-to-end against the engine).</li>

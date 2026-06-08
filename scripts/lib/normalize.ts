@@ -1,94 +1,27 @@
 import path from "node:path";
+import type {
+  Alignment,
+  Character,
+  Gender,
+  Identity,
+  Publisher,
+} from "../../src/lib/engine/types";
 
-export type Publisher = "Marvel" | "DC";
-export type Alignment = "good" | "bad" | "neutral";
-export type Gender = "Male" | "Female";
-export type Identity = "Secret" | "Public" | "Unknown";
-
-export type PowerStats = {
-  intelligence: number;
-  strength: number;
-  speed: number;
-  durability: number;
-  power: number;
-  combat: number;
-};
-
-export type Character = {
-  id: string;
-  name: string;
-  realName: string | null;
-  publisher: Publisher;
-  image: string;
-
-  alignment: Alignment | null;
-  gender: Gender | null;
-  species: string | null;
-  eyeColor: string | null;
-  hairColor: string | null;
-
-  powerstats: PowerStats | null;
-
-  appearances: number | null;
-  yearFirstAppeared: number | null;
-  identity: Identity | null;
-
-  aliases: string[];
-  occupation: string | null;
-  groupAffiliation: string | null;
-  placeOfBirth: string | null;
-  firstAppearance: string | null;
-
-  // Derived in M1.3 (deriveTraits). Keys are trait IDs from data/traits.json.
-  // Value 1.0 = character has trait; 0.0 = doesn't; null = unknown.
-  traits: Record<string, number | null>;
-
-  traitCompleteness: number;
-};
-
-export type TraitCategory =
-  | "universe"
-  | "alignment"
-  | "gender"
-  | "species"
-  | "powers"
-  | "equipment"
-  | "teams"
-  | "era"
-  | "appearance"
-  | "costume"
-  | "secret-identity"
-  | "origin-city"
-  | "adaptations"
-  | "death-resurrection";
-
-export type Trait = {
-  id: string;
-  category: TraitCategory;
-  label: string;
-  polarity: "positive";
-  derivable: boolean;
-};
-
-export type TraitsFile = {
-  version: number;
-  categories: TraitCategory[];
-  traits: Trait[];
-};
-
-export type Question = {
-  id: string;
-  trait: string;
-  category: TraitCategory;
-  text: string;
-  inverse: string;
-  cost: number;
-};
-
-export type QuestionsFile = {
-  version: number;
-  questions: Question[];
-};
+// Re-export data types so downstream scripts can keep importing from
+// `./normalize`. Canonical home is `src/lib/engine/types.ts`.
+export type {
+  Publisher,
+  Alignment,
+  Gender,
+  Identity,
+  PowerStats,
+  Character,
+  TraitCategory,
+  Trait,
+  TraitsFile,
+  Question,
+  QuestionsFile,
+} from "../../src/lib/engine/types";
 
 const PAREN_RE = /\s*\([^)]*\)\s*/g;
 const NON_SLUG_RE = /[^a-z0-9]+/g;
