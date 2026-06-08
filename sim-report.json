@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "noise": 0,
+  "seed": 42,
+  "characters": 460,
+  "accuracy": 0.9869565217391304,
+  "correctCount": 454,
+  "avgTurns": 11.065217391304348,
+  "p50Turns": 10,
+  "p95Turns": 20,
+  "p99Turns": 20,
+  "maxTurns": 20,
+  "topFailures": [
+    {
+      "id": "bushido",
+      "name": "Bushido",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "sparse trait data"
+    },
+    {
+      "id": "destroyer",
+      "name": "Destroyer",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "sparse trait data"
+    },
+    {
+      "id": "songbird",
+      "name": "Songbird",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "sparse trait data"
+    },
+    {
+      "id": "spider-gwen",
+      "name": "Spider-Gwen",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "target in top 5 (rank 2) but engine couldn't commit"
+    },
+    {
+      "id": "stardust",
+      "name": "Stardust",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "sparse trait data"
+    },
+    {
+      "id": "wildfire",
+      "name": "Wildfire",
+      "turns": 20,
+      "wrongGuesses": 3,
+      "outcome": "giveup",
+      "reason": "sparse trait data"
+    }
+  ]
+}

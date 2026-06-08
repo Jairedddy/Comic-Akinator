@@ -764,13 +764,15 @@
           <h4>Testing</h4>
           <ol>
             <li><strong>Run:</strong> <code>npm run sim</code></li>
-            <li><strong>Look for:</strong> completes in under 60 seconds. Final stdout block prints accuracy %, average question count, P95 question count, and a numbered top-20 failure list.</li>
-            <li><strong>Look for:</strong> top-20-failures list contains character names you recognise from the dataset (not <code>undefined</code> / blank slugs). The reason column (sparse traits / ambiguous / etc.) is populated, not all-null.</li>
+            <li><strong>Look for:</strong> finishes in under 60 seconds. Reference values from my baseline run (deterministic with default <code>seed=42</code>): accuracy ~98.7% (454/460), avg turns ~11.1, p95 = 20, max = 20. Numbers should match exactly given the same dataset.</li>
+            <li><strong>Look for:</strong> top failures are obscure characters with sparse trait data (Bushido, Destroyer, Songbird, Stardust, Wildfire, plus Spider-Gwen who reaches rank 2 but the engine can&rsquo;t commit). Names are populated, never <code>undefined</code>.</li>
             <li><strong>Run:</strong> <code>npm run sim -- --noise=0.1</code></li>
-            <li><strong>Look for:</strong> still completes; accuracy is lower than the noise=0 run (any drop is expected &mdash; 10% of answers are now &ldquo;Don&rsquo;t know&rdquo;). Avg question count should be higher too.</li>
+            <li><strong>Look for:</strong> still completes. With 10% of answers swapped to &ldquo;Don&rsquo;t know&rdquo;, accuracy holds at ~98.7% (engine is robust) but avg turns rise to ~12.3. The engine compensates for missing signal by asking more questions.</li>
             <li><strong>Run:</strong> open <code>sim-report.json</code> in your editor.</li>
-            <li><strong>Look for:</strong> parseable JSON with the same numbers as stdout, plus per-character outcome records. The schema should be diff-friendly (sorted keys, deterministic order).</li>
-            <li><strong>Red flag:</strong> sim hangs past 90s, accuracy = 0% (engine broken) or 100% (oracle leakage &mdash; engine cheating), failure list shows blank/undefined names, <code>sim-report.json</code> is malformed JSON, or noise=0.1 run gives <em>higher</em> accuracy than noise=0 (impossible &mdash; means RNG isn&rsquo;t seeded).</li>
+            <li><strong>Look for:</strong> parseable JSON with summary stats matching stdout + a <code>topFailures</code> array. No per-character outcomes block by default (keeps the tracked baseline small). Pass <code>--detailed</code> to include every character.</li>
+            <li><strong>Run:</strong> <code>ls sim-report*.json</code></li>
+            <li><strong>Look for:</strong> two files &mdash; <code>sim-report.json</code> (baseline, committed for M4.1 regression gating) and <code>sim-report-noise-0.1.json</code> (gitignored).</li>
+            <li><strong>Red flag:</strong> sim hangs past 90s, accuracy = 0% (engine broken) or 100% (oracle leakage &mdash; engine cheating), failure list has blank/undefined names, JSON is malformed, or noise=0.1 run gives <em>much higher</em> accuracy than noise=0 (impossible &mdash; means RNG isn&rsquo;t seeded).</li>
           </ol>
 
           <div class="accept">

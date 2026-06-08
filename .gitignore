@@ -10,8 +10,10 @@
 !.yarn/releases
 !.yarn/versions
 
-# sim reports
-/sim-report.json
+# sim reports — baseline (sim-report.json) IS tracked as a regression gate
+# for M4.1. One-off noise/seed sweeps are not.
+/sim-report-noise-*.json
+/sim-report-seed-*.json
 
 # next.js
 /.next/
