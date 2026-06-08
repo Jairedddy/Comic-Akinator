@@ -1,0 +1,853 @@
+{
+  "version": 1,
+  "categories": [
+    "universe",
+    "alignment",
+    "gender",
+    "species",
+    "powers",
+    "equipment",
+    "teams",
+    "era",
+    "appearance",
+    "costume",
+    "secret-identity",
+    "origin-city",
+    "adaptations",
+    "death-resurrection"
+  ],
+  "traits": [
+    {
+      "id": "universe-marvel",
+      "category": "universe",
+      "label": "Marvel Universe",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "universe-dc",
+      "category": "universe",
+      "label": "DC Universe",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "universe-multiverse-crossover",
+      "category": "universe",
+      "label": "Appears in cross-publisher events",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "alignment-hero",
+      "category": "alignment",
+      "label": "Heroic alignment",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "alignment-villain",
+      "category": "alignment",
+      "label": "Villainous alignment",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "alignment-antihero",
+      "category": "alignment",
+      "label": "Morally ambiguous",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "alignment-reformed-villain",
+      "category": "alignment",
+      "label": "Former villain turned hero",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "gender-male",
+      "category": "gender",
+      "label": "Male character",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "gender-female",
+      "category": "gender",
+      "label": "Female character",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "gender-nonbinary-other",
+      "category": "gender",
+      "label": "Non-binary or undefined",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "species-human",
+      "category": "species",
+      "label": "Ordinary human",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-mutant",
+      "category": "species",
+      "label": "Born mutant (X-gene)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-alien",
+      "category": "species",
+      "label": "Extraterrestrial",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-deity",
+      "category": "species",
+      "label": "God or deity",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-android-robot",
+      "category": "species",
+      "label": "Android or robot",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-cyborg",
+      "category": "species",
+      "label": "Human with cybernetic enhancements",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-demon-supernatural",
+      "category": "species",
+      "label": "Demonic or supernatural origin",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-symbiote",
+      "category": "species",
+      "label": "Symbiotic alien lifeform",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-atlantean",
+      "category": "species",
+      "label": "From Atlantis",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-cosmic-entity",
+      "category": "species",
+      "label": "Cosmic abstract being",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "species-magical-being",
+      "category": "species",
+      "label": "Born with magic (witch, sorcerer)",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "power-super-strength",
+      "category": "powers",
+      "label": "Superhuman strength",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-super-speed",
+      "category": "powers",
+      "label": "Superhuman speed",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-super-durability",
+      "category": "powers",
+      "label": "Superhuman durability",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-super-intelligence",
+      "category": "powers",
+      "label": "Genius-level intellect",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-master-combatant",
+      "category": "powers",
+      "label": "Master hand-to-hand fighter",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-cosmic-energy",
+      "category": "powers",
+      "label": "Cosmic or energy projection",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-no-superpowers",
+      "category": "powers",
+      "label": "Possesses no superhuman abilities",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "power-flight",
+      "category": "powers",
+      "label": "Flight",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-telepathy",
+      "category": "powers",
+      "label": "Telepathy / mind-reading",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-telekinesis",
+      "category": "powers",
+      "label": "Telekinesis",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-magic",
+      "category": "powers",
+      "label": "Wields magic",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-elemental-control",
+      "category": "powers",
+      "label": "Controls a classical element",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-regeneration",
+      "category": "powers",
+      "label": "Rapid healing factor",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-shapeshifting",
+      "category": "powers",
+      "label": "Shapeshifting",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-size-changing",
+      "category": "powers",
+      "label": "Size manipulation",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-invisibility",
+      "category": "powers",
+      "label": "Invisibility",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-teleportation",
+      "category": "powers",
+      "label": "Teleportation",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-claws-blades",
+      "category": "powers",
+      "label": "Natural claws or blades",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-web-spinning",
+      "category": "powers",
+      "label": "Spider-like web powers",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-water-control",
+      "category": "powers",
+      "label": "Water or sea-life control",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-super-senses",
+      "category": "powers",
+      "label": "Heightened animal-like senses",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-time-manipulation",
+      "category": "powers",
+      "label": "Time manipulation",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-healing-others",
+      "category": "powers",
+      "label": "Heals or empowers others",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "power-bestial-features",
+      "category": "powers",
+      "label": "Animal-like body features",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "equip-powered-armor",
+      "category": "equipment",
+      "label": "Wears powered armor",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-bow-arrows",
+      "category": "equipment",
+      "label": "Wields a bow and arrows",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-sword-blade",
+      "category": "equipment",
+      "label": "Carries a sword or blade",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-iconic-shield",
+      "category": "equipment",
+      "label": "Carries an iconic shield",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-magic-weapon",
+      "category": "equipment",
+      "label": "Wields a magical weapon",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-utility-belt",
+      "category": "equipment",
+      "label": "Uses a utility belt of gadgets",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-firearms",
+      "category": "equipment",
+      "label": "Uses guns or firearms",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-iconic-vehicle",
+      "category": "equipment",
+      "label": "Has a famous personal vehicle",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "equip-stealth-tech",
+      "category": "equipment",
+      "label": "Uses stealth tech or gear",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "team-avengers",
+      "category": "teams",
+      "label": "Member of the Avengers",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-justice-league",
+      "category": "teams",
+      "label": "Member of the Justice League",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-x-men",
+      "category": "teams",
+      "label": "Member of the X-Men",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-fantastic-four",
+      "category": "teams",
+      "label": "Member of the Fantastic Four",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-guardians-of-galaxy",
+      "category": "teams",
+      "label": "Guardian of the Galaxy",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-bat-family",
+      "category": "teams",
+      "label": "Member of the Bat-Family",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-teen-titans",
+      "category": "teams",
+      "label": "Member of the Teen Titans",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-defenders",
+      "category": "teams",
+      "label": "Member of the Defenders",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-inhumans",
+      "category": "teams",
+      "label": "Inhuman or member of the Inhumans",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-thunderbolts",
+      "category": "teams",
+      "label": "Member of the Thunderbolts",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-suicide-squad",
+      "category": "teams",
+      "label": "Member of the Suicide Squad",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-birds-of-prey",
+      "category": "teams",
+      "label": "Member of Birds of Prey",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-shield",
+      "category": "teams",
+      "label": "S.H.I.E.L.D. operative",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-young-justice",
+      "category": "teams",
+      "label": "Member of Young Justice",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "team-no-team",
+      "category": "teams",
+      "label": "Operates solo, no team affiliation",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "era-golden-age",
+      "category": "era",
+      "label": "Debuted 1938-1956 (Golden Age)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "era-silver-age",
+      "category": "era",
+      "label": "Debuted 1956-1970 (Silver Age)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "era-bronze-age",
+      "category": "era",
+      "label": "Debuted 1970-1985 (Bronze Age)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "era-modern-age",
+      "category": "era",
+      "label": "Debuted 1985-2000 (Modern Age)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "era-recent",
+      "category": "era",
+      "label": "Debuted in 2000 or later",
+      "polarity": "positive",
+      "derivable": true
+    },
+
+    {
+      "id": "eyes-blue",
+      "category": "appearance",
+      "label": "Blue eyes",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "eyes-brown",
+      "category": "appearance",
+      "label": "Brown eyes",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "eyes-green",
+      "category": "appearance",
+      "label": "Green eyes",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "eyes-unusual",
+      "category": "appearance",
+      "label": "Unusual eye color (red, yellow, glowing)",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "hair-black",
+      "category": "appearance",
+      "label": "Black hair",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "hair-blonde",
+      "category": "appearance",
+      "label": "Blonde hair",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "hair-red",
+      "category": "appearance",
+      "label": "Red hair",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "hair-brown",
+      "category": "appearance",
+      "label": "Brown or auburn hair",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "hair-bald",
+      "category": "appearance",
+      "label": "Bald or no hair",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "skin-non-human-color",
+      "category": "appearance",
+      "label": "Non-human skin color",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "physique-imposing",
+      "category": "appearance",
+      "label": "Notably large or muscular build",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "has-facial-hair",
+      "category": "appearance",
+      "label": "Has beard or mustache",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "costume-red",
+      "category": "costume",
+      "label": "Red-dominant costume",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-blue",
+      "category": "costume",
+      "label": "Blue-dominant costume",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-black",
+      "category": "costume",
+      "label": "Black-dominant costume",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-green",
+      "category": "costume",
+      "label": "Green-dominant costume",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-yellow",
+      "category": "costume",
+      "label": "Yellow-dominant costume",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-cape",
+      "category": "costume",
+      "label": "Wears a cape",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-mask",
+      "category": "costume",
+      "label": "Wears a face mask",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-cowl",
+      "category": "costume",
+      "label": "Wears a head cowl",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-chest-symbol",
+      "category": "costume",
+      "label": "Has a chest emblem or insignia",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "costume-helmet",
+      "category": "costume",
+      "label": "Wears a full helmet",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "identity-secret",
+      "category": "secret-identity",
+      "label": "Maintains a secret identity",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "identity-public",
+      "category": "secret-identity",
+      "label": "Identity is publicly known",
+      "polarity": "positive",
+      "derivable": true
+    },
+
+    {
+      "id": "origin-new-york",
+      "category": "origin-city",
+      "label": "From New York",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-gotham",
+      "category": "origin-city",
+      "label": "From Gotham City",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-metropolis",
+      "category": "origin-city",
+      "label": "From Metropolis",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-london-uk",
+      "category": "origin-city",
+      "label": "From London or the UK",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-asgard",
+      "category": "origin-city",
+      "label": "From Asgard",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-atlantis",
+      "category": "origin-city",
+      "label": "From Atlantis",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-outer-space",
+      "category": "origin-city",
+      "label": "From another planet",
+      "polarity": "positive",
+      "derivable": true
+    },
+    {
+      "id": "origin-rural-small-town",
+      "category": "origin-city",
+      "label": "From a small town or rural area",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "origin-other-dimension",
+      "category": "origin-city",
+      "label": "From another dimension",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "origin-future-time-traveler",
+      "category": "origin-city",
+      "label": "Time traveler from the future",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "adapt-mcu-film",
+      "category": "adaptations",
+      "label": "Appeared in MCU films",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "adapt-dceu-film",
+      "category": "adaptations",
+      "label": "Appeared in DCEU films",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "adapt-live-action-tv",
+      "category": "adaptations",
+      "label": "Headlined live-action television",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "adapt-animated-series",
+      "category": "adaptations",
+      "label": "Headlined an animated series",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "adapt-video-game-protagonist",
+      "category": "adaptations",
+      "label": "Headlined a video game",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "adapt-merchandise-icon",
+      "category": "adaptations",
+      "label": "Major merchandise / toy presence",
+      "polarity": "positive",
+      "derivable": false
+    },
+
+    {
+      "id": "dr-died-in-canon",
+      "category": "death-resurrection",
+      "label": "Has died in main canon",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "dr-resurrected",
+      "category": "death-resurrection",
+      "label": "Has been resurrected",
+      "polarity": "positive",
+      "derivable": false
+    },
+    {
+      "id": "dr-currently-alive",
+      "category": "death-resurrection",
+      "label": "Currently alive in canon",
+      "polarity": "positive",
+      "derivable": false
+    }
+  ]
+}

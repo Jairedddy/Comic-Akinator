@@ -4,11 +4,12 @@ import { parse as parseCsv } from "csv-parse/sync";
 import {
   type Character,
   type PowerStats,
+  type TraitsFile,
   PATHS,
-  TRAIT_FIELDS,
   cleanNumber,
   cleanString,
-  countTraits,
+  countNonNullTraits,
+  countSourceFields,
   dedupeKey,
   normalizeAlignment,
   normalizeGender,
@@ -17,6 +18,7 @@ import {
   parseYear,
   slugify,
 } from "./lib/normalize";
+import { deriveTraits } from "./lib/derive-traits";
 
 type SuperheroEntry = {
   id: number;
@@ -77,10 +79,7 @@ function ftLookupKeys(name: string, fullName: string | null): string[] {
   return keys;
 }
 
-function lookupFt(
-  keys: string[],
-  map: Map<string, FtRow>,
-): FtRow | undefined {
+function lookupFt(keys: string[], map: Map<string, FtRow>): FtRow | undefined {
   for (const k of keys) {
     const hit = map.get(k);
     if (hit) return hit;
@@ -121,8 +120,7 @@ function loadSuperhero(
     }
     if (!publisher) continue;
 
-    const image =
-      e.images?.md ?? e.images?.lg ?? e.images?.sm ?? e.images?.xs;
+    const image = e.images?.md ?? e.images?.lg ?? e.images?.sm ?? e.images?.xs;
     if (!image) continue;
 
     const ps = e.powerstats;
@@ -178,6 +176,7 @@ function loadSuperhero(
       placeOfBirth: cleanString(e.biography.placeOfBirth as string),
       firstAppearance: cleanString(e.biography.firstAppearance as string),
 
+      traits: {},
       traitCompleteness: 0,
     });
   }
@@ -187,6 +186,15 @@ function loadSuperhero(
     );
   }
   return out;
+}
+
+function loadTraits(): TraitsFile {
+  ensureFile(
+    PATHS.traits,
+    "data/traits.json is missing. It should be checked in as part of M1.3.",
+  );
+  const raw = fs.readFileSync(PATHS.traits, "utf8");
+  return JSON.parse(raw) as TraitsFile;
 }
 
 function loadFt538(filePath: string, publisher: string): Map<string, FtRow> {
@@ -260,7 +268,7 @@ function dedupeById(chars: Character[]): Character[] {
       seen.set(c.id, c);
       continue;
     }
-    if (countTraits(c) > countTraits(existing)) seen.set(c.id, c);
+    if (countSourceFields(c) > countSourceFields(existing)) seen.set(c.id, c);
   }
   return [...seen.values()];
 }
@@ -337,12 +345,22 @@ function main(): void {
   chars = dedupeById(chars);
   console.log(`  ${chars.length} unique characters`);
 
-  for (const c of chars) c.traitCompleteness = countTraits(c) / TRAIT_FIELDS;
+  console.log("Deriving trait values…");
+  const traitDefs = loadTraits();
+  const totalTraits = traitDefs.traits.length;
+  for (const c of chars) c.traits = deriveTraits(c, traitDefs);
+  for (const c of chars)
+    c.traitCompleteness = countNonNullTraits(c) / totalTraits;
+  const avgNonNull =
+    chars.reduce((s, c) => s + countNonNullTraits(c), 0) / chars.length;
+  console.log(
+    `  populated avg ${avgNonNull.toFixed(1)} / ${totalTraits} traits per character`,
+  );
 
   const before = chars.length;
-  chars = chars.filter((c) => countTraits(c) >= MIN_TRAITS);
+  chars = chars.filter((c) => countNonNullTraits(c) >= MIN_TRAITS);
   console.log(
-    `  dropped ${before - chars.length} characters with fewer than ${MIN_TRAITS} traits`,
+    `  dropped ${before - chars.length} characters with fewer than ${MIN_TRAITS} non-null traits`,
   );
 
   console.log(`Selecting top ${TARGET_COUNT} by completeness × popularity…`);

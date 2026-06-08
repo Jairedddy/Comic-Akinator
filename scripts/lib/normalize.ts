@@ -39,7 +39,55 @@ export type Character = {
   placeOfBirth: string | null;
   firstAppearance: string | null;
 
+  // Derived in M1.3 (deriveTraits). Keys are trait IDs from data/traits.json.
+  // Value 1.0 = character has trait; 0.0 = doesn't; null = unknown.
+  traits: Record<string, number | null>;
+
   traitCompleteness: number;
+};
+
+export type TraitCategory =
+  | "universe"
+  | "alignment"
+  | "gender"
+  | "species"
+  | "powers"
+  | "equipment"
+  | "teams"
+  | "era"
+  | "appearance"
+  | "costume"
+  | "secret-identity"
+  | "origin-city"
+  | "adaptations"
+  | "death-resurrection";
+
+export type Trait = {
+  id: string;
+  category: TraitCategory;
+  label: string;
+  polarity: "positive";
+  derivable: boolean;
+};
+
+export type TraitsFile = {
+  version: number;
+  categories: TraitCategory[];
+  traits: Trait[];
+};
+
+export type Question = {
+  id: string;
+  trait: string;
+  category: TraitCategory;
+  text: string;
+  inverse: string;
+  cost: number;
+};
+
+export type QuestionsFile = {
+  version: number;
+  questions: Question[];
 };
 
 const PAREN_RE = /\s*\([^)]*\)\s*/g;
@@ -133,10 +181,13 @@ export function cleanNumber(
   return n;
 }
 
-// 15 = number of trait fields we count in completeness (keep in sync with countTraits).
-export const TRAIT_FIELDS = 15;
+// Count of source-data fields per character (NOT trait IDs). Used during
+// dedupe — the richer source wins. Keep in sync with countSourceFields.
+export const SOURCE_FIELDS = 15;
 
-export function countTraits(c: Character): number {
+// How many of the 15 source fields are populated? Used by build-dataset for
+// dedupe decisions; not exposed on the final character record.
+export function countSourceFields(c: Character): number {
   let n = 0;
   if (c.alignment) n++;
   if (c.gender) n++;
@@ -156,10 +207,21 @@ export function countTraits(c: Character): number {
   return n;
 }
 
+// How many DERIVED traits have a non-null value? Used by the validator and
+// for top-N selection. Operates on the M1.3 `c.traits` field.
+export function countNonNullTraits(c: Character): number {
+  if (!c.traits) return 0;
+  let n = 0;
+  for (const v of Object.values(c.traits)) if (v !== null) n++;
+  return n;
+}
+
 const ROOT = process.cwd();
 export const PATHS = {
   marvelCsv: path.join(ROOT, "scripts", "sources", "marvel.csv"),
   dcCsv: path.join(ROOT, "scripts", "sources", "dc.csv"),
   superheroJson: path.join(ROOT, "scripts", "sources", "superhero-api.json"),
   output: path.join(ROOT, "data", "characters.json"),
+  traits: path.join(ROOT, "data", "traits.json"),
+  questions: path.join(ROOT, "data", "questions.json"),
 };

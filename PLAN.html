@@ -615,32 +615,57 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M1.3</span><span class="ms-title">Trait taxonomy &amp; question bank</span></div>
-            <div class="ms-desc">~120 traits across 14 categories. ~150 questions with inverse phrasing.</div>
+            <div class="ms-desc">117 traits across 14 categories. 148 questions. Values auto-derived from source data + famous-name lookups.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~5h</span><span class="badge badge-risk">creative</span></p>
+          <p><span class="badge badge-time">~4h</span><span class="badge badge-risk">creative</span></p>
 
           <h4>Goal</h4>
-          <p>A stable controlled vocabulary of traits + a hand-authored set of questions that map to them. The engine's question-picker can only ask what is in this file.</p>
+          <p>A stable controlled vocabulary of traits + a hand-authored set of questions that map to them. Trait values are computed automatically from the source fields (publisher, alignment, gender, species, powerstats, era, eye/hair colour, identity, place-of-birth) plus small hardcoded famous-character lookup sets for traits the data doesn&rsquo;t carry directly. The engine's question-picker can only ask what is in these files.</p>
 
-          <h4>Step-by-step</h4>
+          <h4>Curation approach (chosen during M1.3)</h4>
+          <ul>
+            <li><strong>Derivable traits (48):</strong> Universe, Alignment, Gender, primary Species, era, eye/hair colour, secret identity, key origin cities, and powerstats-driven Powers (super-strength, super-speed, etc.) &mdash; all computed from the existing 15 source fields and small hardcoded famous-character sets in <code>scripts/lib/derive-traits.ts</code>.</li>
+            <li><strong>Placeholder traits (69):</strong> Teams, Equipment, Costume, Adaptations, Death/Resurrection, and the specific Powers that need external data (flight, telepathy, magic, etc.). All values are <code>null</code> at MVP. Engine handles nulls (those questions never get selected). Phase 2 work to populate them.</li>
+            <li><strong>Question tone:</strong> precise phrasing with light comic-world framing (&ldquo;Does your character live in the Marvel Universe?&rdquo; not &ldquo;Is your character published by Marvel Comics?&rdquo;). Inverses are short and blunt.</li>
+          </ul>
+
+          <h4>Files</h4>
+          <ul>
+            <li><code>data/traits.json</code> &mdash; 117 trait IDs, each with <code>{ id, category, label, polarity, derivable }</code>.</li>
+            <li><code>data/questions.json</code> &mdash; 148 questions, each with <code>{ id, trait, category, text, inverse, cost }</code>. Active traits (high-signal) get 2 questions each; placeholders get 1.</li>
+            <li><code>scripts/lib/derive-traits.ts</code> &mdash; rules + named-character lookup tables (<code>KNOWN_DEITIES</code>, <code>KNOWN_ATLANTEANS</code>, <code>KNOWN_GOTHAMITES</code>, etc.). Edit these tables if you find a mis-classified character during playtesting.</li>
+            <li><code>scripts/build-dataset.ts</code> &mdash; calls <code>deriveTraits()</code> after dedupe; result lands in <code>data/characters.json</code> under each entry&rsquo;s <code>traits</code> object.</li>
+            <li><code>scripts/validate-dataset.ts</code> &mdash; checks taxonomy integrity (every question&rsquo;s trait exists; every trait has &ge;1 question) plus per-character non-null floor.</li>
+          </ul>
+
+          <h4>Testing</h4>
           <ol>
-            <li>Create <code>data/traits.json</code> as <code>{ id, category, label, polarity }</code>. Categories (from your questionnaire choice): <em>Universe, Alignment, Gender, Species, Powers, Equipment, Teams, Era, Appearance, Costume, Secret Identity, Origin City, Adaptations, Death/Resurrection</em>. Aim for ~120 trait IDs total.</li>
-            <li>Backfill trait values into <code>characters.json</code> &mdash; for each trait, set boolean or 0&ndash;1 weight where known, <code>null</code> where unknown. For MVP, focus on the top 500 and accept many nulls in lesser-known characters &mdash; the engine handles unknowns.</li>
-            <li>Create <code>data/questions.json</code> as <code>{ id, trait, text, inverse, category, cost: 1 }</code>. ~150 entries. Examples: <em>"Does your character have superhuman strength?"</em>, inverse <em>"No super strength"</em>. Aim for 2&ndash;3 questions per high-signal trait so the engine has variety.</li>
-            <li>Add a sanity script in <code>validate-dataset.ts</code>: every question's <code>trait</code> must exist in <code>traits.json</code>; every trait must appear in &ge; 1 question.</li>
-            <li>Manual sweep: read every question aloud &mdash; if it could be misread or has cultural ambiguity, rewrite.</li>
+            <li><strong>Run:</strong> <code>npm run dataset:build</code></li>
+            <li><strong>Look for:</strong> stdout shows a <code>Deriving trait values&hellip;</code> line and <code>populated avg N / 117 traits per character</code>. Avg should be ~30 or higher.</li>
+            <li><strong>Run:</strong> <code>npm run dataset:validate</code></li>
+            <li><strong>Look for:</strong> exit 0 with <code>117 traits, 148 questions</code> and <code>top-50 characters all have &ge;15 non-null traits (M1.3 target met)</code>.</li>
+            <li><strong>Run:</strong> open <code>data/characters.json</code>, search for <code>"Spider-Man"</code>.</li>
+            <li><strong>Look for:</strong> his <code>traits</code> object has <code>universe-marvel: 1</code>, <code>universe-dc: 0</code>, <code>alignment-hero: 1</code>, <code>gender-male: 1</code>, <code>species-human: 1</code>, <code>origin-new-york: 1</code>. Power traits driven by his powerstats (super-strength etc. should be 1).</li>
+            <li><strong>Run:</strong> in the same file, search for <code>"Batman"</code>.</li>
+            <li><strong>Look for:</strong> <code>universe-dc: 1</code>, <code>universe-marvel: 0</code>, <code>power-no-superpowers: 1</code> (he&rsquo;s a regular human in our lookup table), <code>origin-gotham: 1</code>, <code>species-human: 1</code>.</li>
+            <li><strong>Run:</strong> search for <code>"Thor"</code>.</li>
+            <li><strong>Look for:</strong> <code>species-deity: 1</code> and <code>origin-asgard: 1</code> &mdash; the Superhero API misreports Thor&rsquo;s publisher as a variant label, but our <code>KNOWN_DEITIES</code> + <code>KNOWN_ASGARDIANS</code> lookup rescues him.</li>
+            <li><strong>Run:</strong> open <code>data/questions.json</code>, pick 5 random questions.</li>
+            <li><strong>Look for:</strong> phrasing is unambiguous, precise, and uses comic-world framing (Marvel/DC universes, X-Men, MCU, etc.) rather than dry meta-language (&ldquo;published by&rdquo;, &ldquo;issue&rdquo;). Inverses are short. Each question&rsquo;s <code>trait</code> field matches a real trait id.</li>
+            <li><strong>Red flag:</strong> any famous character with mostly-null traits, validator non-zero, completeness average under 25%, any question referencing a trait that doesn&rsquo;t exist in <code>traits.json</code>, or a character&rsquo;s <code>traits</code> object missing any of the 117 keys.</li>
           </ol>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>traits.json</code> has ~120 entries covering all 14 categories.</li>
-              <li><code>questions.json</code> has ~150 entries, all mapping to real traits.</li>
-              <li>Validation passes.</li>
-              <li>Each top-50 character has &ge; 15 non-null trait values.</li>
+              <li><code>traits.json</code> has 117 entries covering all 14 categories.</li>
+              <li><code>questions.json</code> has 148 entries, all mapping to real traits; every trait has &ge;1 question.</li>
+              <li><code>npm run dataset:validate</code> exits zero.</li>
+              <li>Each top-50 character has &ge;15 non-null trait values.</li>
+              <li>Spider-Man, Batman, Thor have hand-verified-correct trait values per the Testing section above.</li>
             </ul>
           </div>
         </div></div>
@@ -682,15 +707,30 @@
             <li>Implement <code>select.ts</code>. Test: with a clear binary split (half characters Marvel, half DC), <em>"Is your character from Marvel?"</em> wins expected info-gain.</li>
             <li>Implement <code>guess.ts</code> with the threshold table from the plan (turn &ge; 8 + top1 &gt; 0.85 or top1/top2 &gt; 6, soft cap 20, hard cap 25).</li>
             <li>Implement <code>index.ts</code> &mdash; returns <code>{ kind: 'question', q } | { kind: 'guess', characterId } | { kind: 'giveup' }</code>.</li>
-            <li>Cover everything with Vitest. Target 90%+ coverage on the engine folder; it's the riskiest code.</li>
+            <li>Write hand-crafted validators under <code>scripts/checks/</code> (per <a href="TESTING.md"><code>TESTING.md</code></a> &mdash; this project doesn&rsquo;t use Vitest). Each is a small <code>tsx</code> program that sets up a known input, calls the engine, and prints results you eyeball: <code>entropy.ts</code>, <code>posterior.ts</code>, <code>info-gain.ts</code>, <code>full-game.ts</code>.</li>
+          </ol>
+
+          <h4>Testing</h4>
+          <ol>
+            <li><strong>Run:</strong> <code>npx tsx scripts/checks/entropy.ts</code></li>
+            <li><strong>Look for:</strong> <code>entropy(uniform over N) = X.XX (expected ~log2(N) = Y.YY)</code> &mdash; the two numbers should agree to two decimal places.</li>
+            <li><strong>Run:</strong> <code>npx tsx scripts/checks/posterior.ts</code></li>
+            <li><strong>Look for:</strong> after a Yes to a trait where exactly one character has value 1.0, that character&rsquo;s posterior prints as &gt;0.99 and the rest are near zero. Belief vector sum prints as 1.0.</li>
+            <li><strong>Run:</strong> <code>npx tsx scripts/checks/info-gain.ts</code></li>
+            <li><strong>Look for:</strong> with a deliberately 50/50 Marvel/DC pool, the chosen next question has trait <code>universe-marvel</code> or <code>universe-dc</code> (these have maximal expected info-gain in that setup).</li>
+            <li><strong>Run:</strong> <code>npx tsx scripts/checks/full-game.ts spider-man</code> (auto-plays a single character end-to-end against the engine).</li>
+            <li><strong>Look for:</strong> engine guesses <code>spider-man</code> within 25 turns. Print log shows each Q&amp;A and the running top-3 posterior. No <code>NaN</code> values.</li>
+            <li><strong>Run:</strong> grep the engine source for forbidden references: <code>grep -rn "window\|localStorage\|from \"react" src/lib/engine/</code></li>
+            <li><strong>Look for:</strong> no matches. The engine must be pure.</li>
+            <li><strong>Red flag:</strong> any belief vector that doesn&rsquo;t sum to ~1.0, any <code>NaN</code> in posterior output, the engine looping past turn 30, or any non-pure import in the engine folder.</li>
           </ol>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li>All engine unit tests pass.</li>
+              <li>All check scripts under <code>scripts/checks/</code> produce the expected outputs above.</li>
               <li>Engine is pure: no <code>window</code>, no <code>localStorage</code>, no React imports.</li>
-              <li>Manually scripting a game with 15 Yes/No answers against a known character lands on the right guess in &lt;25 turns.</li>
+              <li>Hand-scripting a game with 15 Yes/No answers against a known character lands on the right guess in &lt;25 turns.</li>
             </ul>
           </div>
         </div></div>
@@ -721,10 +761,22 @@
             <li>Save the report to <code>sim-report.json</code> for diff-friendly tracking across commits.</li>
           </ol>
 
+          <h4>Testing</h4>
+          <ol>
+            <li><strong>Run:</strong> <code>npm run sim</code></li>
+            <li><strong>Look for:</strong> completes in under 60 seconds. Final stdout block prints accuracy %, average question count, P95 question count, and a numbered top-20 failure list.</li>
+            <li><strong>Look for:</strong> top-20-failures list contains character names you recognise from the dataset (not <code>undefined</code> / blank slugs). The reason column (sparse traits / ambiguous / etc.) is populated, not all-null.</li>
+            <li><strong>Run:</strong> <code>npm run sim -- --noise=0.1</code></li>
+            <li><strong>Look for:</strong> still completes; accuracy is lower than the noise=0 run (any drop is expected &mdash; 10% of answers are now &ldquo;Don&rsquo;t know&rdquo;). Avg question count should be higher too.</li>
+            <li><strong>Run:</strong> open <code>sim-report.json</code> in your editor.</li>
+            <li><strong>Look for:</strong> parseable JSON with the same numbers as stdout, plus per-character outcome records. The schema should be diff-friendly (sorted keys, deterministic order).</li>
+            <li><strong>Red flag:</strong> sim hangs past 90s, accuracy = 0% (engine broken) or 100% (oracle leakage &mdash; engine cheating), failure list shows blank/undefined names, <code>sim-report.json</code> is malformed JSON, or noise=0.1 run gives <em>higher</em> accuracy than noise=0 (impossible &mdash; means RNG isn&rsquo;t seeded).</li>
+          </ol>
+
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>npm run sim</code> finishes in under 60s for 500 characters.</li>
+              <li><code>npm run sim</code> finishes in under 60s for ~450 characters.</li>
               <li>Report shows a baseline accuracy number (any number &mdash; tuning happens in M4.1).</li>
               <li>Top-20-failures list is human-readable; you can eyeball <em>why</em> the engine missed (sparse traits, ambiguous answers, etc.).</li>
             </ul>
