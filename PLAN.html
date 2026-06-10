@@ -19,6 +19,7 @@
     --accent: #ffd400;
     --accent-2: #e63946;
     --accent-3: #4cc9f0;
+    --test: #c77dff;
     --done: #5cd97a;
     --border: rgba(255,255,255,0.08);
     --border-strong: rgba(255,255,255,0.18);
@@ -177,6 +178,27 @@
     gap: 16px;
     flex-wrap: wrap;
     border-bottom: 3px solid var(--ink);
+    cursor: pointer;
+    user-select: none;
+    transition: filter 150ms;
+  }
+  .phase-head:hover { filter: brightness(1.08); }
+  .phase-head-chevron {
+    font-family: 'Bangers', cursive;
+    font-size: 26px;
+    line-height: 1;
+    transition: transform 280ms cubic-bezier(.4,1.4,.5,1);
+    flex-shrink: 0;
+  }
+  .phase.collapsed .phase-head { border-bottom-color: transparent; }
+  .phase.collapsed .phase-head-chevron { transform: rotate(-90deg); }
+  .phase-body {
+    max-height: 20000px;
+    overflow: hidden;
+    transition: max-height 420ms cubic-bezier(.4,0,.2,1);
+  }
+  .phase.collapsed .phase-body {
+    max-height: 0;
   }
   .phase-head .label {
     font-family: 'Bangers', cursive;
@@ -204,7 +226,6 @@
   }
   .phase-mini-progress { width: 100%; height: 4px; background: rgba(0,0,0,0.35); }
   .phase-mini-fill { height: 100%; width: 0%; background: #0a0a0c; transition: width 300ms ease; }
-  .phase-body { padding: 0; }
 
   /* Milestone rows */
   .milestone {
@@ -293,7 +314,7 @@
     transition: max-height 380ms cubic-bezier(.4,0,.2,1);
     background: var(--bg-detail);
   }
-  .milestone.expanded .ms-details { max-height: 4000px; }
+  .milestone.expanded .ms-details { max-height: 5000px; }
 
   .ms-details-inner {
     padding: 18px 26px 26px 76px;
@@ -308,6 +329,7 @@
     text-transform: uppercase;
   }
   .ms-details h4:first-child { margin-top: 0; }
+  .ms-details h4.testing { color: var(--test); }
   .ms-details p { margin: 6px 0; color: var(--ink-dim); font-size: 14px; }
   .ms-details ol, .ms-details ul {
     padding-left: 22px;
@@ -337,8 +359,6 @@
     line-height: 1.6;
     margin: 8px 0;
   }
-  .ms-details pre .c { color: var(--ink-dimmer); }
-  .ms-details pre .k { color: var(--accent-3); }
   .ms-details pre .s { color: var(--accent); }
   .badge {
     display: inline-block;
@@ -351,6 +371,15 @@
   }
   .badge-time { background: rgba(76,201,240,0.15); color: var(--accent-3); border: 1px solid rgba(76,201,240,0.4); }
   .badge-risk { background: rgba(230,57,70,0.15); color: var(--accent-2); border: 1px solid rgba(230,57,70,0.4); }
+  .testing-block {
+    background: rgba(199,125,255,0.07);
+    border-left: 3px solid var(--test);
+    padding: 10px 14px 12px;
+    margin: 10px 0;
+    border-radius: 2px;
+  }
+  .testing-block p, .testing-block li { color: var(--ink); }
+  .testing-block strong { color: var(--test); }
   .ms-details .accept {
     background: rgba(92,217,122,0.06);
     border-left: 3px solid var(--done);
@@ -433,7 +462,7 @@
   <header class="hero">
     <span class="kicker">FAN PROJECT &middot; v1.0 BUILD PLAN</span>
     <h1>COMIC<br>AKINATOR</h1>
-    <p class="subtitle">A Marvel + DC character-guessing game built in 2&ndash;4 weeks. Entropy-based inference over ~500 well-traited characters (3000+ in Phase 2). Free tier all the way down.</p>
+    <p class="subtitle">A Marvel + DC character-guessing game built in 2&ndash;4 weeks. Entropy-based inference over ~500 well-traited characters (3000+ in Phase 2). Free tier all the way down. <strong style="color:var(--test)">Manual testing only</strong> &mdash; every milestone has a hand-run test pass.</p>
   </header>
 
   <div class="progress-wrap">
@@ -472,67 +501,60 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M1.1</span><span class="ms-title">Repo &amp; scaffold</span></div>
-            <div class="ms-desc">Next.js 16 + TS + Tailwind v4 + Radix utility layer + ESLint + Prettier. Manual-testing convention established.</div>
+            <div class="ms-desc">Next.js + TS + Tailwind + shadcn/ui + Prettier + ESLint. Commit baseline.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~1h</span><span class="badge badge-risk">low risk</span></p>
+          <p><span class="badge badge-time">~2h</span><span class="badge badge-risk">low risk</span></p>
 
           <h4>Goal</h4>
-          <p>Stand up the empty project shell so every later step has something to commit into. No game logic yet &mdash; pure foundation. No automated test framework: this project uses manual <code>Testing</code> sections per milestone (see <a href="TESTING.md"><code>TESTING.md</code></a>).</p>
+          <p>Stand up the empty project shell so every later step has something to commit into. No game logic yet &mdash; pure foundation.</p>
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>From this folder, scaffold the app: <code>npx create-next-app@latest . --typescript --app --tailwind --eslint --src-dir --import-alias "@/*" --disable-git --yes</code>. <strong>Caveat:</strong> if the folder name contains spaces or capitals (npm name restriction), scaffold into a sub-dir (<code>comic-akinator</code>) and move the contents up one level.</li>
-            <li>Install runtime deps + Radix utility layer: <code>npm i zustand framer-motion lottie-react clsx tailwind-merge class-variance-authority</code>. Radix primitives themselves (<code>@radix-ui/react-dialog</code>, etc.) get added on demand starting in M2.x &mdash; not all at once here.</li>
-            <li>Install Prettier + Tailwind plugin + <code>tsx</code> (for running TS scripts): <code>npm i -D prettier prettier-plugin-tailwindcss tsx</code>. Add <code>.prettierrc</code> with <code>{ "plugins": ["prettier-plugin-tailwindcss"] }</code>.</li>
-            <li>Create <code>src/lib/utils.ts</code> exporting <code>cn(...inputs)</code> = <code>twMerge(clsx(inputs))</code>. Every Radix wrapper component in M2.x will use this helper.</li>
+            <li>From this folder, scaffold the app: <code>npx create-next-app@latest . --typescript --app --tailwind --eslint --src-dir --import-alias "@/*"</code> (answer no to Turbopack if prompted &mdash; we want stability).</li>
+            <li>Initialize shadcn/ui: <code>npx shadcn@latest init</code>. Choose Default + Slate base; we&rsquo;ll override colors with our comic palette later.</li>
+            <li>Install runtime deps: <code>npm i zustand framer-motion lottie-react clsx</code></li>
+            <li>Install dev tooling: <code>npm i -D prettier prettier-plugin-tailwindcss tsx</code>. Add <code>.prettierrc</code> with <code>{ "plugins": ["prettier-plugin-tailwindcss"] }</code>.</li>
             <li>Add the script block to <code>package.json</code>:
               <pre><span class="s">"dev"</span>: <span class="s">"next dev"</span>,
 <span class="s">"build"</span>: <span class="s">"npm run dataset:validate &amp;&amp; next build"</span>,
-<span class="s">"sim"</span>: <span class="s">"tsx scripts/sim.ts"</span>,
+<span class="s">"lint"</span>: <span class="s">"next lint"</span>,
+<span class="s">"format"</span>: <span class="s">"prettier --write ."</span>,
 <span class="s">"dataset:build"</span>: <span class="s">"tsx scripts/build-dataset.ts"</span>,
 <span class="s">"dataset:validate"</span>: <span class="s">"tsx scripts/validate-dataset.ts"</span>,
-<span class="s">"lint"</span>: <span class="s">"eslint"</span>,
-<span class="s">"format"</span>: <span class="s">"prettier --write ."</span></pre>
-              <p><code>npm run build</code> will fail at the <code>dataset:validate</code> step until M1.2 ships <code>scripts/validate-dataset.ts</code>. That&rsquo;s intentional &mdash; the gate prevents shipping with a missing or malformed dataset.</p>
+<span class="s">"sim"</span>: <span class="s">"tsx scripts/sim.ts"</span>,
+<span class="s">"play"</span>: <span class="s">"tsx scripts/play-cli.ts"</span></pre>
             </li>
-            <li>Add <code>.gitignore</code> entries for anything missed by <code>create-next-app</code>: <code>.env.local</code>, <code>sim-report.json</code>. (Scaffold already covers <code>.next</code>, <code>node_modules</code>, <code>coverage</code>.)</li>
-            <li>Read <a href="TESTING.md"><code>TESTING.md</code></a>. Every future milestone gets a <code>Testing</code> section in the format described there &mdash; M1.1&rsquo;s is below as the first example.</li>
-            <li>First commit: <code>git init &amp;&amp; git add -A &amp;&amp; git commit -m "chore: scaffold Next.js + Tailwind + Radix utility layer"</code></li>
-            <li>Create a public GitHub repo named <code>comic-akinator</code> and <code>git push -u origin main</code>.</li>
+            <li>Add <code>.gitignore</code> entries for <code>.next</code>, <code>node_modules</code>, <code>coverage</code>, <code>.env.local</code>.</li>
+            <li>First commit on your end (you handle git).</li>
           </ol>
 
           <h4>Files touched</h4>
           <ul>
-            <li><code>package.json</code>, <code>tsconfig.json</code>, <code>next.config.ts</code>, <code>postcss.config.mjs</code> (Tailwind v4 uses CSS-first config &mdash; no <code>tailwind.config.ts</code>)</li>
-            <li><code>.prettierrc</code>, <code>.gitignore</code>, <code>TESTING.md</code></li>
-            <li>Initial <code>src/app/layout.tsx</code>, <code>src/app/page.tsx</code>, <code>src/app/globals.css</code>, <code>src/lib/utils.ts</code></li>
+            <li><code>package.json</code>, <code>tsconfig.json</code>, <code>next.config.ts</code>, <code>tailwind.config.ts</code>, <code>components.json</code></li>
+            <li><code>.prettierrc</code>, <code>.gitignore</code></li>
+            <li>Initial <code>src/app/layout.tsx</code>, <code>src/app/page.tsx</code></li>
           </ul>
 
-          <h4>Testing</h4>
-          <ol>
-            <li><strong>Run:</strong> <code>npm run dev</code></li>
-            <li><strong>Look for:</strong> terminal shows <code>&#x25B2; Next.js 16.x</code> and <code>Local: http://localhost:3000</code>, no errors.</li>
-            <li><strong>Run:</strong> visit <code>http://localhost:3000</code> in a browser.</li>
-            <li><strong>Look for:</strong> the default Next.js welcome page renders. Browser DevTools console has no red errors.</li>
-            <li><strong>Run:</strong> visit <code>http://localhost:3000/this-route-does-not-exist</code></li>
-            <li><strong>Look for:</strong> the Next.js default 404 page.</li>
-            <li><strong>Run:</strong> stop dev (Ctrl+C), then <code>npm run lint</code></li>
-            <li><strong>Look for:</strong> exits 0 with no errors. Warnings on the scaffold files are tolerable.</li>
-            <li><strong>Run:</strong> <code>npx prettier --check .</code></li>
-            <li><strong>Look for:</strong> either &ldquo;All matched files use Prettier code style!&rdquo; or a list of files needing format &mdash; the list is informational, not a failure. Run <code>npm run format</code> to fix.</li>
-            <li><strong>Red flag:</strong> dev-server crash on startup, &ldquo;Module not found&rdquo; errors in the browser, any TypeScript error blocking the page render, or an SSL cert error when running <code>npm install</code> (indicates corp-proxy issue &mdash; resolve before M2.x).</li>
-          </ol>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run dev</code> &rarr; open <code>http://localhost:3000</code> &rarr; default Next.js placeholder loads.</li>
+              <li>Open browser DevTools console &rarr; zero red errors, zero React warnings.</li>
+              <li>Stop the server, run <code>npm run lint</code> &rarr; exits clean.</li>
+              <li>Run <code>npm run format</code> &rarr; exits clean.</li>
+              <li>In VS Code, open <code>page.tsx</code>, change <code>"Hello"</code>, save &rarr; browser hot-reloads within 1s.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>npm run dev</code> serves the Next welcome page at <code>:3000</code> with no console errors.</li>
-              <li><code>src/lib/utils.ts</code> exports <code>cn()</code>.</li>
-              <li><code>npm run lint</code> exits clean.</li>
-              <li>Repo initialized and pushed to GitHub.</li>
+              <li>All 5 manual tests pass.</li>
+              <li>Project tree contains <code>src/app/</code>, <code>tailwind.config.ts</code>, <code>components.json</code>.</li>
+              <li>You&rsquo;ve made an initial commit.</li>
             </ul>
           </div>
         </div></div>
@@ -544,66 +566,50 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M1.2</span><span class="ms-title">Data pipeline script</span></div>
-            <div class="ms-desc">Merge FiveThirtyEight CSVs + Superhero API JSON into a deduped <code>characters.json</code>. Disk-only, no live fetches.</div>
+            <div class="ms-desc">Merge Kaggle + Superhero API + Wikipedia thumbnails into a deduped <code>characters.json</code>.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~3h</span><span class="badge badge-risk">data risk</span></p>
+          <p><span class="badge badge-time">~6h</span><span class="badge badge-risk">data risk</span></p>
 
           <h4>Goal</h4>
-          <p>One offline script that produces a canonical <code>data/characters.json</code> from three pre-downloaded source files. Everything downstream &mdash; the engine, the UI, the sim &mdash; reads from this file. The pipeline never touches the network: all sources are downloaded once by the user (sidesteps corp-SSL inspection).</p>
+          <p>One offline script that produces a canonical <code>data/characters.json</code> from public sources. Everything downstream &mdash; the engine, the UI, the sim &mdash; reads from this file.</p>
 
-          <h4>Sources (all free, no account, no key)</h4>
+          <h4>Sources (all free, no key)</h4>
           <ul>
-            <li><strong>FiveThirtyEight Marvel CSV</strong> &mdash; <a href="https://raw.githubusercontent.com/fivethirtyeight/data/master/comic-characters/marvel-wikia-data.csv">raw.githubusercontent.com/.../marvel-wikia-data.csv</a> &rarr; save to <code>scripts/sources/marvel.csv</code>. Provides identity, alignment, gender, eye/hair colour, first-appearance year, comic-appearance count.</li>
-            <li><strong>FiveThirtyEight DC CSV</strong> &mdash; <a href="https://raw.githubusercontent.com/fivethirtyeight/data/master/comic-characters/dc-wikia-data.csv">raw.githubusercontent.com/.../dc-wikia-data.csv</a> &rarr; save to <code>scripts/sources/dc.csv</code>.</li>
-            <li><strong>Superhero API JSON dump</strong> &mdash; <a href="https://akabab.github.io/superhero-api/api/all.json">akabab.github.io/superhero-api/api/all.json</a> &rarr; save to <code>scripts/sources/superhero-api.json</code>. 731 characters with powerstats, biography, appearance, work, connections, and an embedded <code>image.url</code>. Images come from this source &mdash; no Wikipedia lookups, no extra HTTPS calls in the pipeline.</li>
+            <li><strong>Kaggle Marvel + DC characters CSV</strong> &mdash; download once, save to <code>scripts/sources/kaggle-marvel.csv</code> and <code>kaggle-dc.csv</code>. Gives alignment, gender, eye/hair color, publisher, year of first appearance.</li>
+            <li><strong>Superhero API JSON dump</strong> &mdash; pull from <code>https://akabab.github.io/superhero-api/api/all.json</code>. 731 characters with powerstats, biography, appearance, work, connections. Save to <code>scripts/sources/superhero-api.json</code>.</li>
+            <li><strong>Wikipedia thumbnails</strong> &mdash; resolve image URLs by querying Wikipedia REST <code>/page/summary/{name}</code> (free, no key). Cache results to <code>scripts/sources/image-cache.json</code> so re-runs are fast.</li>
           </ul>
-          <p>The original plan called for Kaggle + Wikipedia image lookups. Both required either an account or ~500 live HTTPS calls (which the corp SSL filter intercepts). FiveThirtyEight is the same comic-characters data Kaggle hosts but free on GitHub; Superhero API's embedded image URLs cover every shipped character for MVP. Phase 2 can swap in Wikipedia thumbnails if image URL rot becomes an issue.</p>
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Create <code>scripts/sources/</code> and download the 3 files above into it (right-click &rarr; Save link as, or wget from a non-corp machine). Commit them &mdash; they&rsquo;re part of the build, not artifacts.</li>
-            <li>Install the one new dep: <code>npm i -D csv-parse</code></li>
-            <li>Build <code>scripts/lib/normalize.ts</code> with the canonical <code>Character</code> type and helpers: <code>slugify()</code>, <code>dedupeKey()</code>, <code>normalizePublisher()</code>, <code>normalizeAlignment()</code>, <code>normalizeGender()</code>, <code>normalizeIdentity()</code>, <code>parseYear()</code>, <code>cleanString()</code>, <code>cleanNumber()</code>, <code>countTraits()</code>. All sources funnel through these so the schema stays uniform.</li>
-            <li>Build <code>scripts/build-dataset.ts</code>: <strong>(a)</strong> load Superhero API, filter to Marvel/DC entries with an image &rarr; <strong>(b)</strong> load FiveThirtyEight CSVs into lookup maps keyed by <code>dedupeKey(name)</code> &rarr; <strong>(c)</strong> for each Superhero entry, merge in matching FT row to fill <code>appearances</code>, <code>yearFirstAppeared</code>, <code>identity</code>, and any missing alignment/gender/eye/hair &rarr; <strong>(d)</strong> dedupe by <code>id</code>, keeping the richer entry &rarr; <strong>(e)</strong> score completeness = populated trait count / 15 &rarr; <strong>(f)</strong> select top 500 by <code>completeness &times; (1 + log10(appearances + 1))</code> &rarr; <strong>(g)</strong> write to <code>data/characters.json</code>.</li>
-            <li>Build <code>scripts/validate-dataset.ts</code>: assert array of &ge;400 entries, every one has id + name + publisher + image + &ge;8 non-null traits, no duplicate ids, publisher is Marvel or DC. Exit nonzero on violation (this gates <code>npm run build</code>).</li>
-            <li>Run <code>npm run dataset:build</code>. Read the stdout report &mdash; min/avg/max completeness, Marvel/DC split, top 10 by appearances, any famous-hero misses.</li>
-            <li>Commit <code>data/characters.json</code> (the source of truth for the app, not a build artifact).</li>
+            <li>Create <code>scripts/sources/</code> directory and download the three sources once. Commit the CSV/JSON; do NOT commit <code>image-cache.json</code> initially &mdash; let it rebuild.</li>
+            <li>Install pipeline-only deps: <code>npm i -D csv-parse</code></li>
+            <li>Build <code>scripts/lib/normalize.ts</code> with the canonical schema and helpers: <code>slugify(name)</code>, <code>dedupeKey(realName, publisher)</code>.</li>
+            <li>Build <code>scripts/build-dataset.ts</code> doing in order: <strong>(a)</strong> load CSV + JSON sources &rarr; <strong>(b)</strong> normalize each into a partial <code>Character</code> &rarr; <strong>(c)</strong> merge on dedupeKey, preferring richer fields &rarr; <strong>(d)</strong> resolve image URLs via Wikipedia (with cache + 300ms rate-limit between requests) &rarr; <strong>(e)</strong> compute a <code>traitCompleteness</code> score per character &rarr; <strong>(f)</strong> select top 500 by completeness &times; popularity &rarr; <strong>(g)</strong> write to <code>data/characters.json</code>.</li>
+            <li>Build <code>scripts/validate-dataset.ts</code>: assert every character has id, name, publisher, image, &ge; 8 non-null traits. Exit nonzero on violation (this gates <code>npm run build</code>).</li>
           </ol>
 
-          <h4>Files touched</h4>
-          <ul>
-            <li><code>scripts/sources/marvel.csv</code>, <code>dc.csv</code>, <code>superhero-api.json</code> (downloaded by user)</li>
-            <li><code>scripts/lib/normalize.ts</code> &mdash; schema + helpers</li>
-            <li><code>scripts/build-dataset.ts</code>, <code>scripts/validate-dataset.ts</code></li>
-            <li><code>data/characters.json</code> (generated, committed)</li>
-          </ul>
-
-          <h4>Testing</h4>
-          <ol>
-            <li><strong>Run:</strong> <code>npm run dataset:build</code></li>
-            <li><strong>Look for:</strong> stdout reports loading Superhero API + both FiveThirtyEight CSVs, augmentation count, then <code>Wrote ~500 characters to data/characters.json</code>. No stack traces.</li>
-            <li><strong>Look for:</strong> the <code>completeness</code> summary line &mdash; avg should be &ge; 70%. If it&rsquo;s much lower, the FiveThirtyEight merge is misaligned (check that you saved as <code>marvel.csv</code> / <code>dc.csv</code>, not e.g. <code>marvel-wikia-data.csv</code>).</li>
-            <li><strong>Look for:</strong> the <code>top 10 by appearances</code> list &mdash; should include Spider-Man, Batman, Superman, Iron Man, Wolverine, or similar. If you see deep cuts like &ldquo;A-Bomb&rdquo; or &ldquo;Agent 13&rdquo; topping the list, the merge with FiveThirtyEight failed.</li>
-            <li><strong>Look for:</strong> the <code>heads-up: N canonical heroes not in final set</code> line &mdash; should say &ldquo;all canonical top heroes present&rdquo; or list at most 1&ndash;2 misses.</li>
-            <li><strong>Run:</strong> <code>npm run dataset:validate</code></li>
-            <li><strong>Look for:</strong> exit 0 with <code>validate-dataset: N characters OK</code>. Nonzero with a numbered list of violations means the build is shipping bad data.</li>
-            <li><strong>Run:</strong> open <code>data/characters.json</code> in your editor; search for &ldquo;Spider-Man&rdquo;, &ldquo;Batman&rdquo;, &ldquo;Wonder Woman&rdquo;.</li>
-            <li><strong>Look for:</strong> each entry has a populated <code>image</code> field (URL), at least 8 non-null trait fields, sane <code>publisher</code> + <code>alignment</code>.</li>
-            <li><strong>Run:</strong> pick 5 random <code>image</code> URLs from the JSON and paste them into your browser.</li>
-            <li><strong>Look for:</strong> the image loads. If 1&ndash;2 are broken (URL rot at the source), tolerable for MVP. If most are broken, the Superhero API JSON is stale &mdash; redownload.</li>
-            <li><strong>Red flag:</strong> fewer than 400 entries, validation exits nonzero, top-10-by-appearances is all unknowns, or completeness avg below 50%.</li>
-          </ol>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run dataset:build</code> &rarr; completes in &lt;5 minutes; prints a summary like <code>"500 characters written, 23 dropped"</code>.</li>
+              <li>Open <code>data/characters.json</code> in VS Code &rarr; ~500 top-level entries; each has <code>id</code>, <code>name</code>, <code>publisher</code>, <code>image</code>.</li>
+              <li>Pick 10 random entries; paste each <code>image</code> URL into your browser &rarr; all 10 load without 404.</li>
+              <li>Search the file for these names &mdash; all must be present: <em>Spider-Man, Batman, Superman, Iron Man, Wonder Woman, Wolverine, Hulk, Flash, Aquaman, Captain America</em>.</li>
+              <li>Run <code>npm run dataset:validate</code> &rarr; exits 0 with <code>"OK: 500 / 500 valid"</code>.</li>
+              <li>Manually corrupt one entry (delete its <code>image</code> field), re-run validate &rarr; exits nonzero with a specific error pointing at that character. Restore.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>data/characters.json</code> exists with ~500 entries.</li>
-              <li>Every entry has a populated image URL and &ge;8 non-null traits.</li>
-              <li><code>npm run dataset:validate</code> exits zero.</li>
-              <li>Top-10-by-appearances list contains recognizable mainstream Marvel/DC heroes.</li>
+              <li>All 6 tests pass.</li>
+              <li>Every character has a working image URL and &ge; 8 populated traits.</li>
+              <li>Top 50 most-popular Marvel/DC heroes are all present.</li>
             </ul>
           </div>
         </div></div>
@@ -615,57 +621,41 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M1.3</span><span class="ms-title">Trait taxonomy &amp; question bank</span></div>
-            <div class="ms-desc">117 traits across 14 categories. 148 questions. Values auto-derived from source data + famous-name lookups.</div>
+            <div class="ms-desc">~120 traits across 14 categories. ~150 questions with inverse phrasing.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~4h</span><span class="badge badge-risk">creative</span></p>
+          <p><span class="badge badge-time">~5h</span><span class="badge badge-risk">creative</span></p>
 
           <h4>Goal</h4>
-          <p>A stable controlled vocabulary of traits + a hand-authored set of questions that map to them. Trait values are computed automatically from the source fields (publisher, alignment, gender, species, powerstats, era, eye/hair colour, identity, place-of-birth) plus small hardcoded famous-character lookup sets for traits the data doesn&rsquo;t carry directly. The engine's question-picker can only ask what is in these files.</p>
+          <p>A stable controlled vocabulary of traits + a hand-authored set of questions that map to them. The engine&rsquo;s question-picker can only ask what is in this file.</p>
 
-          <h4>Curation approach (chosen during M1.3)</h4>
-          <ul>
-            <li><strong>Derivable traits (48):</strong> Universe, Alignment, Gender, primary Species, era, eye/hair colour, secret identity, key origin cities, and powerstats-driven Powers (super-strength, super-speed, etc.) &mdash; all computed from the existing 15 source fields and small hardcoded famous-character sets in <code>scripts/lib/derive-traits.ts</code>.</li>
-            <li><strong>Placeholder traits (69):</strong> Teams, Equipment, Costume, Adaptations, Death/Resurrection, and the specific Powers that need external data (flight, telepathy, magic, etc.). All values are <code>null</code> at MVP. Engine handles nulls (those questions never get selected). Phase 2 work to populate them.</li>
-            <li><strong>Question tone:</strong> precise phrasing with light comic-world framing (&ldquo;Does your character live in the Marvel Universe?&rdquo; not &ldquo;Is your character published by Marvel Comics?&rdquo;). Inverses are short and blunt.</li>
-          </ul>
-
-          <h4>Files</h4>
-          <ul>
-            <li><code>data/traits.json</code> &mdash; 117 trait IDs, each with <code>{ id, category, label, polarity, derivable }</code>.</li>
-            <li><code>data/questions.json</code> &mdash; 148 questions, each with <code>{ id, trait, category, text, inverse, cost }</code>. Active traits (high-signal) get 2 questions each; placeholders get 1.</li>
-            <li><code>scripts/lib/derive-traits.ts</code> &mdash; rules + named-character lookup tables (<code>KNOWN_DEITIES</code>, <code>KNOWN_ATLANTEANS</code>, <code>KNOWN_GOTHAMITES</code>, etc.). Edit these tables if you find a mis-classified character during playtesting.</li>
-            <li><code>scripts/build-dataset.ts</code> &mdash; calls <code>deriveTraits()</code> after dedupe; result lands in <code>data/characters.json</code> under each entry&rsquo;s <code>traits</code> object.</li>
-            <li><code>scripts/validate-dataset.ts</code> &mdash; checks taxonomy integrity (every question&rsquo;s trait exists; every trait has &ge;1 question) plus per-character non-null floor.</li>
-          </ul>
-
-          <h4>Testing</h4>
+          <h4>Step-by-step</h4>
           <ol>
-            <li><strong>Run:</strong> <code>npm run dataset:build</code></li>
-            <li><strong>Look for:</strong> stdout shows a <code>Deriving trait values&hellip;</code> line and <code>populated avg N / 117 traits per character</code>. Avg should be ~30 or higher.</li>
-            <li><strong>Run:</strong> <code>npm run dataset:validate</code></li>
-            <li><strong>Look for:</strong> exit 0 with <code>117 traits, 148 questions</code> and <code>top-50 characters all have &ge;15 non-null traits (M1.3 target met)</code>.</li>
-            <li><strong>Run:</strong> open <code>data/characters.json</code>, search for <code>"Spider-Man"</code>.</li>
-            <li><strong>Look for:</strong> his <code>traits</code> object has <code>universe-marvel: 1</code>, <code>universe-dc: 0</code>, <code>alignment-hero: 1</code>, <code>gender-male: 1</code>, <code>species-human: 1</code>, <code>origin-new-york: 1</code>. Power traits driven by his powerstats (super-strength etc. should be 1).</li>
-            <li><strong>Run:</strong> in the same file, search for <code>"Batman"</code>.</li>
-            <li><strong>Look for:</strong> <code>universe-dc: 1</code>, <code>universe-marvel: 0</code>, <code>power-no-superpowers: 1</code> (he&rsquo;s a regular human in our lookup table), <code>origin-gotham: 1</code>, <code>species-human: 1</code>.</li>
-            <li><strong>Run:</strong> search for <code>"Thor"</code>.</li>
-            <li><strong>Look for:</strong> <code>species-deity: 1</code> and <code>origin-asgard: 1</code> &mdash; the Superhero API misreports Thor&rsquo;s publisher as a variant label, but our <code>KNOWN_DEITIES</code> + <code>KNOWN_ASGARDIANS</code> lookup rescues him.</li>
-            <li><strong>Run:</strong> open <code>data/questions.json</code>, pick 5 random questions.</li>
-            <li><strong>Look for:</strong> phrasing is unambiguous, precise, and uses comic-world framing (Marvel/DC universes, X-Men, MCU, etc.) rather than dry meta-language (&ldquo;published by&rdquo;, &ldquo;issue&rdquo;). Inverses are short. Each question&rsquo;s <code>trait</code> field matches a real trait id.</li>
-            <li><strong>Red flag:</strong> any famous character with mostly-null traits, validator non-zero, completeness average under 25%, any question referencing a trait that doesn&rsquo;t exist in <code>traits.json</code>, or a character&rsquo;s <code>traits</code> object missing any of the 117 keys.</li>
+            <li>Create <code>data/traits.json</code> as <code>{ id, category, label, polarity }</code>. Categories: <em>Universe, Alignment, Gender, Species, Powers, Equipment, Teams, Era, Appearance, Costume, Secret Identity, Origin City, Adaptations, Death/Resurrection</em>. Aim for ~120 trait IDs total.</li>
+            <li>Backfill trait values into <code>characters.json</code> &mdash; for each trait, set boolean or 0&ndash;1 weight where known, <code>null</code> where unknown.</li>
+            <li>Create <code>data/questions.json</code> as <code>{ id, trait, text, inverse, category, cost: 1 }</code>. ~150 entries. Aim for 2&ndash;3 questions per high-signal trait.</li>
+            <li>Extend <code>validate-dataset.ts</code>: every question&rsquo;s <code>trait</code> must exist in <code>traits.json</code>; every trait must appear in &ge; 1 question.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run dataset:validate</code> &rarr; passes with no orphan questions or unused traits.</li>
+              <li>Open <code>questions.json</code>, read every question text <em>aloud</em>. If any sounds ambiguous, awkward, or culturally tricky, rewrite it.</li>
+              <li>Pick 5 top-tier characters (Spider-Man, Batman, etc.) &rarr; in <code>characters.json</code> count their non-null trait values &rarr; each must have &ge; 15.</li>
+              <li>For each of the 14 categories, confirm there are &ge; 4 questions covering it (grep <code>questions.json</code> for the category).</li>
+              <li>Manually delete a trait from <code>traits.json</code> that&rsquo;s referenced by a question &rarr; re-run validate &rarr; it errors with the exact orphan question ID. Restore.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>traits.json</code> has 117 entries covering all 14 categories.</li>
-              <li><code>questions.json</code> has 148 entries, all mapping to real traits; every trait has &ge;1 question.</li>
-              <li><code>npm run dataset:validate</code> exits zero.</li>
-              <li>Each top-50 character has &ge;15 non-null trait values.</li>
-              <li>Spider-Man, Batman, Thor have hand-verified-correct trait values per the Testing section above.</li>
+              <li>All 5 tests pass.</li>
+              <li>120 traits &times; 150 questions, fully cross-referenced.</li>
+              <li>Top-50 characters all have &ge; 15 non-null trait values.</li>
             </ul>
           </div>
         </div></div>
@@ -690,7 +680,7 @@
           <h4>Module layout (<code>src/lib/engine/</code>)</h4>
           <ul>
             <li><code>types.ts</code> &mdash; <code>Answer</code>, <code>Belief</code>, <code>GameState</code>, <code>EngineDecision</code></li>
-            <li><code>likelihood.ts</code> &mdash; maps <code>(answer, traitValue)</code> &rarr; multiplier (see plan&rsquo;s answer table)</li>
+            <li><code>likelihood.ts</code> &mdash; maps <code>(answer, traitValue)</code> &rarr; multiplier</li>
             <li><code>posterior.ts</code> &mdash; <code>update(belief, question, answer, chars)</code> with min-floor 1e-6, renormalize</li>
             <li><code>entropy.ts</code> &mdash; <code>entropy(belief)</code></li>
             <li><code>select.ts</code> &mdash; <code>nextQuestion(state, pool)</code> with info-gain + diversity penalty (0.85x if category is in last 2)</li>
@@ -701,36 +691,35 @@
           <h4>Step-by-step</h4>
           <ol>
             <li>Write <code>types.ts</code> first &mdash; pin the shapes before any logic.</li>
-            <li>Implement <code>likelihood.ts</code>. Unit-test the 5 answer types against trait values 0, 0.5, 1, and null.</li>
-            <li>Implement <code>posterior.ts</code>. Unit-test: a "Yes" to a trait where only one character has value 1.0 should drive that character&rsquo;s posterior to ~1.0 after one update.</li>
-            <li>Implement <code>entropy.ts</code> (Shannon, base 2). Unit-test entropy(uniform) &asymp; log2(N).</li>
-            <li>Implement <code>select.ts</code>. Test: with a clear binary split (half characters Marvel, half DC), <em>"Is your character from Marvel?"</em> wins expected info-gain.</li>
-            <li>Implement <code>guess.ts</code> with the threshold table from the plan (turn &ge; 8 + top1 &gt; 0.85 or top1/top2 &gt; 6, soft cap 20, hard cap 25).</li>
+            <li>Implement <code>likelihood.ts</code>.</li>
+            <li>Implement <code>posterior.ts</code>.</li>
+            <li>Implement <code>entropy.ts</code> (Shannon, base 2).</li>
+            <li>Implement <code>select.ts</code> with info-gain + diversity penalty.</li>
+            <li>Implement <code>guess.ts</code> with the threshold table (turn &ge; 8 + top1 &gt; 0.85 or top1/top2 &gt; 6, soft cap 20, hard cap 25).</li>
             <li>Implement <code>index.ts</code> &mdash; returns <code>{ kind: 'question', q } | { kind: 'guess', characterId } | { kind: 'giveup' }</code>.</li>
-            <li>Write hand-crafted validators under <code>scripts/checks/</code> (per <a href="TESTING.md"><code>TESTING.md</code></a> &mdash; this project doesn&rsquo;t use Vitest). Each is a small <code>tsx</code> program that sets up a known input, calls the engine, and prints results you eyeball: <code>entropy.ts</code>, <code>posterior.ts</code>, <code>info-gain.ts</code>, <code>full-game.ts</code>.</li>
+            <li>Build <code>scripts/play-cli.ts</code>: a tiny CLI that loops <code>engine.decide()</code> &harr; <code>readline</code> input, prints the chosen question, reads 1&ndash;5 from your terminal, and prints the engine&rsquo;s guess at the end.</li>
           </ol>
 
-          <h4>Testing</h4>
-          <ol>
-            <li><strong>Run:</strong> <code>npx tsx scripts/checks/entropy.ts</code></li>
-            <li><strong>Look for:</strong> <code>entropy(uniform over N) = X.XX (expected ~log2(N) = Y.YY)</code> &mdash; the two numbers should agree to two decimal places.</li>
-            <li><strong>Run:</strong> <code>npx tsx scripts/checks/posterior.ts</code></li>
-            <li><strong>Look for:</strong> synthetic 3-character test &mdash; alice (the only one with the trait) gets posterior ~0.905 (the math ceiling for a single update with our 19:1 likelihood ratio), bob and carol get ~0.048 each. Sum is 1.0. The dominance ratio between alice and the others is &gt;10x.</li>
-            <li><strong>Run:</strong> <code>npx tsx scripts/checks/info-gain.ts</code></li>
-            <li><strong>Look for:</strong> with a deliberately 50/50 Marvel/DC pool, the chosen next question has trait <code>universe-marvel</code> or <code>universe-dc</code> (these have maximal expected info-gain in that setup).</li>
-            <li><strong>Run:</strong> <code>npx tsx scripts/checks/full-game.ts spider-man</code> (auto-plays a single character end-to-end against the engine).</li>
-            <li><strong>Look for:</strong> engine guesses <code>spider-man</code> within 25 turns. Print log shows each Q&amp;A and the running top-3 posterior. No <code>NaN</code> values.</li>
-            <li><strong>Run:</strong> grep the engine source for forbidden references: <code>grep -rn "window\|localStorage\|from \"react" src/lib/engine/</code></li>
-            <li><strong>Look for:</strong> no matches. The engine must be pure.</li>
-            <li><strong>Red flag:</strong> any belief vector that doesn&rsquo;t sum to ~1.0, any <code>NaN</code> in posterior output, the engine looping past turn 30, or any non-pure import in the engine folder.</li>
-          </ol>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <p>The whole point of the CLI script is to exercise the engine by hand. Play a series of games against known characters; the engine should land the right guess inside 25 turns.</p>
+            <ol>
+              <li>Run <code>npm run play</code>. Pick Spider-Man in your head. Answer truthfully &rarr; engine guesses Spider-Man within 25 turns.</li>
+              <li>Repeat for: Batman, Wonder Woman, Magneto, Thanos. All 5 must land the right guess.</li>
+              <li>Play a 6th game as Spider-Man and answer "Don&rsquo;t know" to half the questions &mdash; engine still narrows to a top-3 that includes Spider-Man.</li>
+              <li>Play a 7th game and intentionally answer wrong for the first 3 questions, then truthfully &mdash; engine should recover and still land in &le; 25 turns.</li>
+              <li>Play a game as an obscure character not in the dataset &rarr; engine eventually emits <code>kind: 'giveup'</code> at or before turn 25.</li>
+              <li>Inspect the CLI&rsquo;s per-turn output: top-3 candidates + their posterior probabilities. Each Yes answer should visibly shift mass toward characters with that trait.</li>
+              <li>Verify the engine has no <code>window</code>, <code>localStorage</code>, or React imports &mdash; grep <code>src/lib/engine/</code> for those strings &rarr; zero hits.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li>All check scripts under <code>scripts/checks/</code> produce the expected outputs above.</li>
-              <li>Engine is pure: no <code>window</code>, no <code>localStorage</code>, no React imports.</li>
-              <li>Hand-scripting a game with 15 Yes/No answers against a known character lands on the right guess in &lt;25 turns.</li>
+              <li>All 7 tests pass.</li>
+              <li>5 of 5 known characters guessed inside 25 turns under truthful play.</li>
+              <li>Engine module is pure (no DOM/React/storage).</li>
             </ul>
           </div>
         </div></div>
@@ -750,37 +739,35 @@
           <p><span class="badge badge-time">~3h</span><span class="badge badge-risk">important</span></p>
 
           <h4>Goal</h4>
-          <p>An offline benchmark that plays a full game for every character in the dataset, using that character&rsquo;s own traits as the oracle. Gives you a single number for "how good is the engine right now?" and a list of characters the engine struggles with &mdash; gold for tuning.</p>
+          <p>An offline benchmark that plays a full game for every character in the dataset, using that character&rsquo;s own traits as the oracle. Gives you a single number for "how good is the engine?" and a list of characters the engine struggles with.</p>
 
           <h4>Step-by-step</h4>
           <ol>
             <li>Create <code>scripts/sim.ts</code>.</li>
-            <li>For each character C in the dataset: initialize a fresh <code>GameState</code>; loop calling <code>engine.decide(state)</code>; when it asks a question, answer using C&rsquo;s trait value (1.0&rarr;Yes, 0.0&rarr;No, 0.4&ndash;0.6&rarr;Probably, null&rarr;Don&rsquo;t know); when it guesses, record hit/miss; if miss, continue per the wrong-guess loop; cap at 30 turns.</li>
+            <li>For each character C: initialize a fresh <code>GameState</code>; loop calling <code>engine.decide(state)</code>; answer using C&rsquo;s trait value (1.0&rarr;Yes, 0.0&rarr;No, 0.4&ndash;0.6&rarr;Probably, null&rarr;Don&rsquo;t know); record hit/miss; cap at 30 turns.</li>
             <li>Aggregate: % correctly guessed, average question count, P95 question count, top 20 characters by failure.</li>
-            <li>Write a CLI flag <code>--noise=0.1</code> that flips 10% of oracle answers to "Don&rsquo;t know" to simulate fuzzy human players.</li>
+            <li>CLI flag <code>--noise=0.1</code> flips 10% of oracle answers to "Don&rsquo;t know".</li>
             <li>Save the report to <code>sim-report.json</code> for diff-friendly tracking across commits.</li>
           </ol>
 
-          <h4>Testing</h4>
-          <ol>
-            <li><strong>Run:</strong> <code>npm run sim</code></li>
-            <li><strong>Look for:</strong> finishes in under 60 seconds. Reference values from my baseline run (deterministic with default <code>seed=42</code>): accuracy ~98.7% (454/460), avg turns ~11.1, p95 = 20, max = 20. Numbers should match exactly given the same dataset.</li>
-            <li><strong>Look for:</strong> top failures are obscure characters with sparse trait data (Bushido, Destroyer, Songbird, Stardust, Wildfire, plus Spider-Gwen who reaches rank 2 but the engine can&rsquo;t commit). Names are populated, never <code>undefined</code>.</li>
-            <li><strong>Run:</strong> <code>npm run sim -- --noise=0.1</code></li>
-            <li><strong>Look for:</strong> still completes. With 10% of answers swapped to &ldquo;Don&rsquo;t know&rdquo;, accuracy holds at ~98.7% (engine is robust) but avg turns rise to ~12.3. The engine compensates for missing signal by asking more questions.</li>
-            <li><strong>Run:</strong> open <code>sim-report.json</code> in your editor.</li>
-            <li><strong>Look for:</strong> parseable JSON with summary stats matching stdout + a <code>topFailures</code> array. No per-character outcomes block by default (keeps the tracked baseline small). Pass <code>--detailed</code> to include every character.</li>
-            <li><strong>Run:</strong> <code>ls sim-report*.json</code></li>
-            <li><strong>Look for:</strong> two files &mdash; <code>sim-report.json</code> (baseline, committed for M4.1 regression gating) and <code>sim-report-noise-0.1.json</code> (gitignored).</li>
-            <li><strong>Red flag:</strong> sim hangs past 90s, accuracy = 0% (engine broken) or 100% (oracle leakage &mdash; engine cheating), failure list has blank/undefined names, JSON is malformed, or noise=0.1 run gives <em>much higher</em> accuracy than noise=0 (impossible &mdash; means RNG isn&rsquo;t seeded).</li>
-          </ol>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run sim</code> &rarr; finishes in under 60 s for 500 characters.</li>
+              <li>Output prints summary: accuracy %, avg questions, P95 questions, list of top-20 failures.</li>
+              <li>Open <code>sim-report.json</code> &rarr; one entry per character with <code>{ guessed, turns }</code>.</li>
+              <li>Run <code>npm run sim -- --noise=0.1</code> &rarr; accuracy drops vs. baseline; report still completes.</li>
+              <li>Open the top-3 failure characters in <code>characters.json</code> &rarr; eyeball <em>why</em> they failed (sparse traits? trait values that don&rsquo;t differentiate them from siblings?).</li>
+              <li>Manually corrupt a character&rsquo;s traits to be all <code>null</code>, re-run sim &rarr; that character should appear in failures. Restore.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li><code>npm run sim</code> finishes in under 60s for ~450 characters.</li>
-              <li>Report shows a baseline accuracy number (any number &mdash; tuning happens in M4.1).</li>
-              <li>Top-20-failures list is human-readable; you can eyeball <em>why</em> the engine missed (sparse traits, ambiguous answers, etc.).</li>
+              <li>All 6 tests pass.</li>
+              <li>Baseline accuracy number recorded (any number &mdash; tuning is M4.1).</li>
+              <li>Top-20-failures list is human-readable and actionable.</li>
             </ul>
           </div>
         </div></div>
@@ -818,21 +805,28 @@
           <h4>Step-by-step</h4>
           <ol>
             <li>Load Bangers + Inter + JetBrains Mono via <code>next/font/google</code> in <code>src/app/layout.tsx</code>. Apply via CSS variables.</li>
-            <li>Override Tailwind theme in <code>tailwind.config.ts</code>: dark base colors, comic accents (<code>accent</code>: <code>#ffd400</code>, <code>villain</code>: <code>#e63946</code>, <code>hero</code>: <code>#4cc9f0</code>, <code>victory</code>: <code>#5cd97a</code>). Add <code>fontFamily.display</code> = Bangers.</li>
+            <li>Override Tailwind theme in <code>tailwind.config.ts</code>: dark base, comic accents (<code>accent</code>: <code>#ffd400</code>, <code>villain</code>: <code>#e63946</code>, <code>hero</code>: <code>#4cc9f0</code>, <code>victory</code>: <code>#5cd97a</code>). Add <code>fontFamily.display</code> = Bangers.</li>
             <li>Build <code>src/components/layout/AppShell.tsx</code> with header (logo + nav), main slot, footer (disclaimer + privacy link).</li>
-            <li>Create a global halftone background via a fixed SVG dot pattern as <code>::before</code>. Same recipe as this plan HTML.</li>
+            <li>Global halftone background via fixed SVG dot pattern as <code>::before</code>.</li>
             <li>Stub routes: <code>/</code>, <code>/play</code>, <code>/result/[id]</code>, <code>/history</code>, <code>/about</code>, <code>/privacy</code>. Each gets a placeholder heading inside <code>AppShell</code>.</li>
-            <li>Add <code>not-found.tsx</code> with comic-style "Off-panel!" 404.</li>
-            <li>Run Lighthouse on <code>/</code> &mdash; should already score 90+ since there&rsquo;s nothing heavy yet. Set the baseline.</li>
+            <li>Add <code>not-found.tsx</code> with a comic-style "Off-panel!" 404.</li>
           </ol>
 
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li><code>npm run dev</code>. Visit each route in turn: <code>/</code>, <code>/play</code>, <code>/result/test</code>, <code>/history</code>, <code>/about</code>, <code>/privacy</code>. All load without 404.</li>
+              <li>Visit <code>/intentionally-broken</code> &rarr; styled "Off-panel!" 404 page.</li>
+              <li>On every route: header + footer present, Bangers font visible in headings, halftone dots visible on background.</li>
+              <li>DevTools &rarr; toggle device toolbar &rarr; cycle widths 320, 360, 768, 1024, 1440 &rarr; no horizontal scroll at 360+, no broken layouts.</li>
+              <li>DevTools console on each route &rarr; zero errors, zero hydration warnings.</li>
+              <li>Footer disclaimer + privacy link visible site-wide.</li>
+              <li>Grep <code>src/</code> for hardcoded hex colors (e.g. <code>"#ff"</code>) outside <code>tailwind.config.ts</code> &rarr; zero hits.</li>
+            </ol>
+          </div>
+
           <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>All 6 routes load with matching dark comic theme.</li>
-              <li>Fonts swap in under 100ms.</li>
-              <li>Theme tokens are used (no hard-coded hex outside <code>tailwind.config.ts</code>).</li>
-            </ul>
+            <p><strong>Done when:</strong> all 7 tests pass.</p>
           </div>
         </div></div>
       </div>
@@ -855,21 +849,27 @@
             <li><code>src/components/play/QuestionCard.tsx</code> &mdash; large display-font question, AnimatePresence wrap so questions cross-fade.</li>
             <li><code>AnswerButtonRow.tsx</code> &mdash; 5 buttons: Yes / Probably / Don&rsquo;t know / Probably not / No. Each shows its keyboard shortcut (1&ndash;5) in a small chip.</li>
             <li>Wire keyboard: <code>useEffect</code> with <code>window.addEventListener('keydown', ...)</code> mapping 1&ndash;5 to answer dispatch. Clean up on unmount.</li>
-            <li><code>ProgressDots.tsx</code> &mdash; 25 dots in a row, current turn highlighted; previous turns colored by answer type (Yes=green, No=red, etc.).</li>
-            <li><code>HintLine.tsx</code> &mdash; subtle "I'm thinking about {N} characters" hint based on the count of characters with non-trivial posterior (&gt; 0.001).</li>
-            <li>For now, drive these with a fake state object &mdash; real wiring is M2.3.</li>
-            <li>Accessibility: each button has <code>aria-label</code> with the full answer text + keyboard hint.</li>
+            <li><code>ProgressDots.tsx</code> &mdash; 25 dots in a row, current turn highlighted; previous turns colored by answer type.</li>
+            <li><code>HintLine.tsx</code> &mdash; subtle "I&rsquo;m thinking about {N} characters" hint based on count of characters with posterior &gt; 0.001.</li>
+            <li>Drive these with a fake state object for now &mdash; real wiring is M2.3.</li>
+            <li>ARIA: each button has <code>aria-label</code> with the full answer + keyboard hint.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Visiting <code>/play</code> shows a fake question + functional buttons.</li>
-              <li>Pressing 1&ndash;5 dispatches answers.</li>
-              <li>Progress dots advance.</li>
-              <li>Reduced-motion users see instant transitions instead of cross-fades.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Visit <code>/play</code> &rarr; large question text + 5 large answer buttons visible above the fold on a 360px viewport.</li>
+              <li>Click each button in order &rarr; console logs the dispatched answer.</li>
+              <li>Without clicking, press keys <code>1</code> <code>2</code> <code>3</code> <code>4</code> <code>5</code> &rarr; same dispatches occur.</li>
+              <li>Press <code>6</code>, <code>0</code>, <code>a</code> &rarr; nothing happens (no error, no dispatch).</li>
+              <li>Tab through with keyboard only &rarr; focus ring visible on each button; Enter activates the focused button.</li>
+              <li>Progress dots: after 3 answers, the first 3 are colored, the rest are dim.</li>
+              <li>Hint line shows a number that changes as state changes (mock the count to verify).</li>
+              <li>DevTools &rarr; Rendering &rarr; "Emulate CSS prefers-reduced-motion: reduce" &rarr; question swap is instant, no cross-fade.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -889,21 +889,30 @@
           <h4>Step-by-step</h4>
           <ol>
             <li><code>src/state/gameStore.ts</code> using Zustand + <code>persist</code> middleware writing to <code>localStorage</code> key <code>ca:game:v1</code>.</li>
-            <li>State shape: <code>{ status: 'idle'|'asking'|'guessing'|'wrong-guess'|'giveup'|'won'|'lost', belief, asked: Question[], answers: Answer[], guesses: string[], lastGuess: string|null, turn: number, missCount: number }</code>.</li>
+            <li>State shape: <code>{ status, belief, asked, answers, guesses, lastGuess, turn, missCount }</code>.</li>
             <li>Actions: <code>startGame()</code>, <code>answer(a)</code>, <code>confirmGuess(yes)</code>, <code>reveal(charId)</code>, <code>giveUp()</code>, <code>reset()</code>.</li>
-            <li>Each action calls into <code>engine.decide()</code> to compute the next step and writes the result to state.</li>
+            <li>Each action calls <code>engine.decide()</code> and writes the result to state.</li>
             <li>Replace M2.2&rsquo;s fake state with this real store.</li>
-            <li>On landing page, read the store at mount; if <code>status !== 'idle'</code> and <code>turn &gt; 0</code>, show a <code>&lt;ResumeBanner&gt;</code> with "Resume" + "Start over" buttons.</li>
+            <li>On landing page, if <code>status !== 'idle'</code> and <code>turn &gt; 0</code>, show a <code>&lt;ResumeBanner&gt;</code> with "Resume" + "Start over" buttons.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Mid-game refresh restores exact state.</li>
-              <li>Answering progresses the question stream from the real engine.</li>
-              <li>"Start over" clears the persisted slot.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Visit <code>/</code> with empty localStorage &rarr; no resume banner.</li>
+              <li>Click "Play" &rarr; arrive at <code>/play</code> with a real engine-generated question.</li>
+              <li>Answer 5 questions &rarr; each one advances; progress dots fill correctly.</li>
+              <li>Hit F5 (hard refresh) &rarr; visit <code>/</code> &rarr; resume banner appears with "Game in progress &mdash; turn 6".</li>
+              <li>Click "Resume" &rarr; back at <code>/play</code> on the exact next question.</li>
+              <li>DevTools &rarr; Application &rarr; Local Storage &rarr; <code>ca:game:v1</code> contains the full state.</li>
+              <li>Refresh again &rarr; resume banner still there.</li>
+              <li>Click "Start over" &rarr; localStorage slot cleared, fresh game starts.</li>
+              <li>Open <code>/play</code> in a new private window &rarr; no resume; brand new game.</li>
+              <li>Try answering with localStorage disabled (DevTools &rarr; Application &rarr; Storage &rarr; Block) &rarr; game still works in-memory; just doesn&rsquo;t resume.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 10 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -922,21 +931,27 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>GuessReveal.tsx</code> &mdash; modal-style card with the suspect&rsquo;s image (with skeleton-loader + silhouette fallback), name, and Yes / No buttons.</li>
-            <li>"Yes" dispatches <code>confirmGuess(true)</code> &rarr; navigate to <code>/result/[gameId]</code>.</li>
-            <li>"No" dispatches <code>confirmGuess(false)</code> &rarr; belief mass for that character zeroed + renormalized, asked-list cleared of "already answered" guesses, return to question screen.</li>
-            <li>After 3 wrong guesses in the same game, redirect to <code>/give-up</code> (handled in M2.5).</li>
-            <li>Hard-cap of 25 questions still applies. If hit without confidence, route to give-up.</li>
+            <li><code>GuessReveal.tsx</code> &mdash; modal card with the suspect&rsquo;s image (skeleton loader + silhouette fallback), name, Yes / No buttons.</li>
+            <li>"Yes" &rarr; <code>confirmGuess(true)</code> &rarr; navigate to <code>/result/[gameId]</code>.</li>
+            <li>"No" &rarr; <code>confirmGuess(false)</code> &rarr; that character&rsquo;s posterior mass &rarr; 0, asked-list cleaned, return to question screen.</li>
+            <li>After 3 wrong guesses in one game, redirect to <code>/give-up</code>.</li>
+            <li>Hard cap of 25 questions still applies &mdash; route to <code>/give-up</code> if hit.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>End-to-end happy path works: play &rarr; guess &rarr; Yes &rarr; result page.</li>
-              <li>Wrong-guess loop works: play &rarr; guess &rarr; No &rarr; more questions &rarr; better guess.</li>
-              <li>3 wrong guesses routes to give-up.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Pick Spider-Man in your head; play; answer Yes to engine&rsquo;s guess &rarr; land on <code>/result/[id]</code> showing Spider-Man.</li>
+              <li>Pick Batman; play; on first guess answer "No" even if engine guessed Batman &rarr; engine keeps asking and eventually guesses Batman again or someone close.</li>
+              <li>Force 3 wrong guesses by always saying "No" &rarr; auto-route to <code>/give-up</code>.</li>
+              <li>Start a game and skip every question with "Don&rsquo;t know" for 25 turns &rarr; engine routes to <code>/give-up</code> at the hard cap.</li>
+              <li>During the guess modal: image fails to load (block in DevTools Network) &rarr; silhouette fallback renders, no broken-image icon.</li>
+              <li>DevTools &rarr; throttle network "Slow 3G" &rarr; click Yes &rarr; loading state visible, no double-clicks possible.</li>
+              <li>Press Esc during the guess modal &rarr; modal closes or returns focus correctly (whichever you chose).</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 7 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -955,21 +970,28 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>/give-up</code> route reads the current belief, sorts by posterior, shows top 5 as a grid of character cards.</li>
-            <li>If user picks one &rarr; treat as a successful guess &rarr; <code>/result</code>.</li>
-            <li>"It was someone else" opens a <code>CharacterSearchModal</code> &mdash; fuzzy search (use <code>fuse.js</code> or simple <code>String.includes</code> &mdash; <code>fuse</code> is &lt;5 KB gzipped) over <code>characters.json</code> by name.</li>
-            <li>Once revealed, append to <code>localStorage</code> key <code>ca:misses:v1</code>: <code>{ gameId, characterId, asked: [...], answers: [...], at: ISOString }</code>. This is the Phase-2 learning queue seed.</li>
+            <li><code>/give-up</code> route reads current belief, sorts by posterior, shows top 5 as character cards.</li>
+            <li>Picking one &rarr; treat as success &rarr; <code>/result</code>.</li>
+            <li>"Someone else" opens <code>CharacterSearchModal</code> &mdash; fuzzy search via <code>fuse.js</code> (&lt; 5 KB gzipped).</li>
+            <li>Once revealed, append to <code>localStorage</code> key <code>ca:misses:v1</code>: <code>{ gameId, characterId, asked, answers, at }</code>.</li>
             <li>Navigate to <code>/result</code> in "give-up" mode (different copy: "Got me. It was {name}").</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Top-5 grid renders 5 distinct characters.</li>
-              <li>Search modal finds Spider-Man typing "spider".</li>
-              <li>Misses persist across reloads in <code>localStorage</code>.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Force a give-up by saying No to 3 guesses &rarr; <code>/give-up</code> shows 5 distinct character cards with names + images.</li>
+              <li>Click one of the top-5 &rarr; land on <code>/result</code> with that character.</li>
+              <li>Restart, force give-up again, click "Someone else" &rarr; search modal opens with input focused.</li>
+              <li>Type <code>spi</code> &rarr; Spider-Man (and any Spider-* variants) appear within 100ms.</li>
+              <li>Type total gibberish <code>zzqxk</code> &rarr; empty state copy renders (no crash).</li>
+              <li>Pick a result &rarr; land on <code>/result</code>.</li>
+              <li>DevTools &rarr; Local Storage &rarr; <code>ca:misses:v1</code> contains the miss record with <code>asked</code> + <code>answers</code> arrays.</li>
+              <li>Press Esc inside the search modal &rarr; modal closes, focus returns to "Someone else" button.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -988,21 +1010,27 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>/result/[gameId]</code> &mdash; reads game record from <code>localStorage</code> key <code>ca:history:v1</code> (write the record from the gameStore at game-end).</li>
-            <li>History record shape: <code>{ id, characterId, questionCount, missCount, outcome: 'won'|'gaveup', at }</code>.</li>
-            <li>Layout: hero image + name + publisher + "Guessed in N questions" + 2-3 line bio paragraph from <code>characters.json</code>.</li>
-            <li>CTAs: "Play again" (resets store + routes to <code>/play</code>) and a Share button (stub for M3.1).</li>
-            <li>Unknown gameId &rarr; show a graceful "this game expired" page with Play-again CTA.</li>
+            <li><code>/result/[gameId]</code> reads game record from <code>localStorage</code> key <code>ca:history:v1</code> (written by the gameStore at game-end).</li>
+            <li>Record shape: <code>{ id, characterId, questionCount, missCount, outcome: 'won'|'gaveup', at }</code>.</li>
+            <li>Layout: hero image + name + publisher + "Guessed in N questions" + 2&ndash;3 line bio.</li>
+            <li>CTAs: "Play again" (reset + route to <code>/play</code>) and a stub Share button (real impl in M3.1).</li>
+            <li>Unknown gameId &rarr; graceful "this game expired" page with Play-again CTA.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Win path lands here with correct character.</li>
-              <li>Give-up path lands here with revealed character + "Got me" copy.</li>
-              <li>Direct URL load works after refresh.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Win a game &rarr; result page shows correct character image, name, publisher, "Guessed in N", bio.</li>
+              <li>Hard refresh the result URL &rarr; same page renders without re-fetch errors.</li>
+              <li>Click "Play again" &rarr; old state cleared, fresh <code>/play</code>.</li>
+              <li>Manually navigate to <code>/result/nonexistent-id</code> &rarr; "expired" page renders with Play-again button.</li>
+              <li>Give-up flow: pick from top-5 &rarr; result page shows "Got me. It was {name}" copy variant.</li>
+              <li>Result page has <code>title</code> + <code>description</code> meta visible in DevTools &rarr; Elements &rarr; <code>&lt;head&gt;</code>.</li>
+              <li>Mobile 360px viewport: image + bio stack vertically, no overflow.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 7 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1037,21 +1065,27 @@
             <li><code>npm i @vercel/og</code> &mdash; no extra config needed on Vercel.</li>
             <li>Create <code>src/app/api/share-image/route.tsx</code> with <code>export const runtime = 'edge'</code>.</li>
             <li>Query params: <code>?c={characterId}&amp;n={questionCount}&amp;o={outcome}</code>. Validate with Zod.</li>
-            <li>Render template: dark comic gradient bg, character image (right), bold display "Guessed in {N}!" or "{character} stumped me!" copy (left), "Comic Akinator" wordmark bottom-right.</li>
+            <li>Render: dark comic gradient bg, character image right, bold display "Guessed in {N}!" or "{character} stumped me!" left, "Comic Akinator" wordmark bottom-right.</li>
             <li>Cache: <code>headers: { 'Cache-Control': 'public, immutable, no-transform, s-maxage=2592000, stale-while-revalidate=86400' }</code>.</li>
-            <li>Wire the result page&rsquo;s <code>metadata</code> to set <code>og:image</code> and <code>twitter:image</code> pointing at the API URL with the right params.</li>
-            <li>Share button: try <code>navigator.share({ url, title })</code> first, fall back to clipboard copy of the result URL with a toast.</li>
-            <li>Validate by pasting a result URL into <a href="https://cards-dev.twitter.com/validator">cards-dev.twitter.com/validator</a>.</li>
+            <li>Wire the result page&rsquo;s <code>metadata</code> to set <code>og:image</code> and <code>twitter:image</code> pointing at the API URL.</li>
+            <li>Share button: try <code>navigator.share({ url, title })</code> first, fall back to clipboard with toast.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Direct API URL returns a 1200&times;630 PNG in &lt;500ms cold.</li>
-              <li>Twitter/X card preview renders correctly.</li>
-              <li>Share button works on iOS Safari + Android Chrome.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Hit <code>http://localhost:3000/api/share-image?c=spider-man&amp;n=12&amp;o=won</code> in your browser &rarr; PNG renders inline.</li>
+              <li>Save the image &rarr; 1200&times;630, polished, character + copy visible, wordmark present.</li>
+              <li>Hit the same URL again &rarr; comes back faster (cache).</li>
+              <li>Hit with bad params <code>?c=fake&amp;n=abc</code> &rarr; returns a graceful fallback image, not a 500.</li>
+              <li>Deploy to a Vercel preview, open the result page, paste the preview URL into <a href="https://cards-dev.twitter.com/validator">cards-dev.twitter.com/validator</a> &rarr; card preview renders.</li>
+              <li>On the result page on desktop Chrome: click Share &rarr; URL copied to clipboard + toast shows.</li>
+              <li>On a real phone (iOS Safari or Android Chrome): click Share &rarr; native share sheet opens.</li>
+              <li>DevTools Network &rarr; the og-image request fires only on social crawlers, not in normal page nav.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1070,22 +1104,30 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>npm i -D @ducanh2912/next-pwa</code> (actively maintained Next 15 fork) and wrap <code>next.config.ts</code>.</li>
-            <li>Create <code>public/manifest.json</code> with <code>name</code>, <code>short_name: "Akinator"</code>, dark theme color, maskable icons at 192 + 512.</li>
-            <li>Generate icons quickly with <a href="https://maskable.app">maskable.app</a> from a single SVG mark &mdash; export the set.</li>
-            <li>Service worker strategy: cache <code>characters.json</code>, fonts, app shell with <code>StaleWhileRevalidate</code>. Cache images with <code>CacheFirst</code> + 30-day expiration.</li>
-            <li>Add an <code>/api/dataset-version</code> endpoint returning the dataset checksum so the SW can swap in updates.</li>
-            <li>Test offline: Chrome DevTools &rarr; Application &rarr; Service Workers &rarr; check "Offline" &rarr; start a new game &rarr; should work.</li>
+            <li><code>npm i -D @ducanh2912/next-pwa</code> (Next 15 fork) and wrap <code>next.config.ts</code>.</li>
+            <li><code>public/manifest.json</code> with <code>name</code>, <code>short_name: "Akinator"</code>, dark theme color, maskable icons 192 + 512.</li>
+            <li>Generate icons quickly with <a href="https://maskable.app">maskable.app</a> from a single SVG mark.</li>
+            <li>Service worker: <code>StaleWhileRevalidate</code> for <code>characters.json</code> + fonts + shell; <code>CacheFirst</code> for images with 30-day expiry.</li>
+            <li>Add <code>/api/dataset-version</code> returning the dataset checksum so the SW can swap in updates.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Chrome shows install prompt on desktop + mobile.</li>
-              <li>Disabling network mid-game still lets you finish.</li>
-              <li>Updating the dataset and redeploying causes installed users to refresh on next launch.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run build &amp;&amp; npm start</code> (SW only registers in production mode).</li>
+              <li>Visit <code>http://localhost:3000</code> &rarr; DevTools &rarr; Application &rarr; Manifest &rarr; no errors; icons render.</li>
+              <li>Application &rarr; Service Workers &rarr; status "activated and running".</li>
+              <li>Chrome address bar shows install icon &rarr; click &rarr; app installs.</li>
+              <li>Launch installed app &rarr; opens in standalone window.</li>
+              <li>Play one game online so assets cache.</li>
+              <li>DevTools &rarr; Network &rarr; check "Offline" &rarr; reload &rarr; app shell still renders.</li>
+              <li>Start a new game offline &rarr; plays through to result without network calls.</li>
+              <li>Application &rarr; Cache Storage &rarr; entries for HTML, JS, CSS, fonts, <code>characters.json</code>, character images.</li>
+              <li>Re-deploy with a changed dataset &rarr; reload installed app &rarr; new version picked up on next start.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 10 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1104,22 +1146,29 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Source Lottie JSONs from <a href="https://lottiefiles.com">lottiefiles.com</a> (free tier): "thinking" (default), "cheer" (yes/probably), "shrug" (don't know), "frown" (no/probably not). Save under <code>public/lottie/</code>.</li>
-            <li>Build <code>&lt;ReactionLottie answer={...} /&gt;</code> that swaps the JSON per last answer. Lazy-load via dynamic import to keep initial bundle thin.</li>
-            <li>Page transitions: <code>AnimatePresence</code> in a <code>template.tsx</code> wrapping each route with a slide+fade. 220ms duration; easing <code>cubic-bezier(.4,0,.2,1)</code>.</li>
-            <li>Guess reveal: card flip via Framer&rsquo;s <code>rotateY</code>; particle burst (CSS keyframed dots radiating out) on confirmed win.</li>
-            <li>Wrap every animation with a <code>useReducedMotion()</code> guard: if true, swap to instant transitions and a still Lottie frame.</li>
-            <li>Performance check: scroll-jank-test, FPS profile on a mid-tier Android. Keep frame budget &lt; 16 ms.</li>
+            <li>Source 4 Lottie JSONs from <a href="https://lottiefiles.com">lottiefiles.com</a> (free): "thinking", "cheer", "shrug", "frown". Save under <code>public/lottie/</code>.</li>
+            <li><code>&lt;ReactionLottie answer={...} /&gt;</code> swaps JSON per last answer. Lazy-load via dynamic import.</li>
+            <li>Page transitions via <code>AnimatePresence</code> in <code>template.tsx</code>: slide+fade, 220ms, <code>cubic-bezier(.4,0,.2,1)</code>.</li>
+            <li>Guess reveal: Framer <code>rotateY</code> card flip; particle burst (CSS-keyframed dots radiating) on confirmed win.</li>
+            <li>Wrap every animation with <code>useReducedMotion()</code>: instant transitions + still Lottie frame if true.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Every screen transition + reveal feels intentional.</li>
-              <li><code>prefers-reduced-motion</code> kills all motion cleanly &mdash; nothing breaks.</li>
-              <li>Animations don't regress Lighthouse Performance below 90.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Play through; on every answer, the reaction Lottie swaps appropriately (cheer on Yes, shrug on Don&rsquo;t-know, frown on No).</li>
+              <li>Question &rarr; question transitions look smooth (no jank, no layout shift between).</li>
+              <li>Guess reveal: card flips smoothly into place.</li>
+              <li>Win path: particle burst plays once and finishes &mdash; no infinite loop.</li>
+              <li>DevTools &rarr; Performance &rarr; record a transition &rarr; frames stay &le; 16ms (60 fps).</li>
+              <li>DevTools &rarr; Rendering &rarr; reduced-motion: reduce &rarr; transitions become instant; Lottie shows a still frame; no broken layouts; no console errors.</li>
+              <li>On a real mid-tier Android phone, transitions still feel snappy.</li>
+              <li>DevTools &rarr; Network &rarr; first page load doesn&rsquo;t pull all 4 Lottie JSONs &mdash; only the one needed.</li>
+              <li>Run Lighthouse Performance after this milestone &rarr; still &ge; 90.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 9 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1129,31 +1178,45 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">M3.4</span><span class="ms-title">WCAG 2.1 AA pass</span></div>
-            <div class="ms-desc">Keyboard, ARIA, focus, contrast, reduced-motion verified.</div>
+            <div class="ms-desc">Keyboard, ARIA, focus, contrast, reduced-motion verified by hand.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
           <p><span class="badge badge-time">~4h</span></p>
 
-          <h4>Step-by-step</h4>
+          <h4>Tools needed (all free browser extensions)</h4>
+          <ul>
+            <li><strong>axe DevTools</strong> &mdash; free Chrome/Firefox extension from Deque. Click "Scan All" on each page.</li>
+            <li><strong>Lighthouse</strong> &mdash; built into Chrome DevTools. Accessibility audit.</li>
+            <li><strong>Wave</strong> &mdash; free Chrome extension as a second-opinion scanner.</li>
+            <li><strong>NVDA</strong> (Windows, free) or <strong>VoiceOver</strong> (macOS, built-in) for screen-reader smoke.</li>
+          </ul>
+
+          <h4>Step-by-step (build work)</h4>
           <ol>
-            <li>Install <code>@axe-core/playwright</code> (already in M1.1) and add an a11y E2E test per screen: <code>await new AxeBuilder({ page }).analyze()</code> &mdash; assert 0 violations of <code>wcag2aa</code> tags.</li>
-            <li>Manual keyboard pass: Tab through every screen. Every interactive element reachable. Focus ring visible (style if needed).</li>
-            <li>Audit color contrast in DevTools "Contrast" picker. Anything &lt; 4.5:1 against background gets darkened/lightened until it passes.</li>
-            <li>Add ARIA labels on icon-only buttons. <code>role="status"</code> + <code>aria-live="polite"</code> on the "I'm thinking about N characters" hint.</li>
-            <li>Skip-to-content link for keyboard users at the top of <code>AppShell</code>.</li>
-            <li>Screen-reader smoke test with NVDA or VoiceOver: can you play a full game with eyes closed?</li>
+            <li>Add a skip-to-content link at the top of <code>AppShell</code>.</li>
+            <li>ARIA labels on icon-only buttons.</li>
+            <li><code>role="status"</code> + <code>aria-live="polite"</code> on the "I&rsquo;m thinking about N characters" hint.</li>
+            <li>Visible focus rings on all interactive elements (Tailwind <code>focus-visible</code> utilities).</li>
+            <li>Audit color contrast in DevTools &mdash; any pair below 4.5:1 against background gets adjusted.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>axe scans clean on all 6 screens.</li>
-              <li>Lighthouse Accessibility = 100.</li>
-              <li>Keyboard-only playthrough completes without trapping.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Install axe DevTools extension. Scan each of <code>/</code>, <code>/play</code>, <code>/result/[id]</code>, <code>/give-up</code>, <code>/history</code>, <code>/about</code>, <code>/privacy</code> &rarr; 0 violations on each.</li>
+              <li>Scan the same routes with Wave &rarr; 0 errors (warnings OK).</li>
+              <li>Chrome Lighthouse &rarr; Accessibility audit on <code>/</code> and <code>/play</code> &rarr; both score 100.</li>
+              <li>Unplug your mouse. Tab through every route, every interactive control &rarr; every focusable element is reachable and the focus ring is clearly visible.</li>
+              <li>Skip-to-content link appears on first Tab and works.</li>
+              <li>DevTools &rarr; Lighthouse &rarr; check the "Contrast" highlight in the Elements pane &rarr; no failing pairs.</li>
+              <li>Turn on NVDA or VoiceOver. Play a full game eyes-closed (or eyes-open but trusting only audio) &rarr; you can understand every question, hear answer-button labels, and reach the result.</li>
+              <li>Try the question screen with <code>prefers-reduced-motion</code> on &rarr; still fully usable.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1174,20 +1237,28 @@
           <ol>
             <li>First-run modal on <code>/</code>: 3 slides &mdash; how to play, the 5 answer choices, the give-up flow. Dismissible. Store <code>ca:seen-intro:v1</code> in <code>localStorage</code>.</li>
             <li><code>/history</code> empty state: comic-style speech bubble "No games yet! Start playing &rarr;".</li>
-            <li>Dataset fetch error: if <code>characters.json</code> fails to load (somehow), show a retry card with cached-offline-mode fallback.</li>
+            <li>Dataset fetch error: if <code>characters.json</code> fails to load, show retry card with offline-mode fallback.</li>
             <li>Offline cache-miss for an asset: graceful "we&rsquo;ll be back when you have signal" panel.</li>
-            <li>Next.js <code>error.tsx</code> + <code>global-error.tsx</code> with a Sentry capture + comic 500 panel.</li>
-            <li>Edge cases: zero-belief state (all characters eliminated), URL with invalid gameId, attempt to share before game ends.</li>
+            <li>Next.js <code>error.tsx</code> + <code>global-error.tsx</code> with a comic 500 panel.</li>
+            <li>Dev-only <code>/debug-throw</code> route that throws on render &mdash; for the boundary test below.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Every error state has its own visual; nothing shows a default React error overlay.</li>
-              <li>Onboarding shows once per device.</li>
-              <li>Throwing a manual error mid-game lands on the styled error boundary.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>DevTools &rarr; Application &rarr; Clear site data. Visit <code>/</code> &rarr; onboarding modal appears.</li>
+              <li>Click through all 3 slides &rarr; dismisses; <code>ca:seen-intro:v1</code> = true.</li>
+              <li>Reload <code>/</code> &rarr; onboarding does NOT appear again.</li>
+              <li>Visit <code>/history</code> with empty <code>ca:history:v1</code> &rarr; empty-state speech bubble.</li>
+              <li>DevTools &rarr; Network &rarr; block <code>characters.json</code> &rarr; reload <code>/play</code> &rarr; retry card renders with offline fallback link.</li>
+              <li>Visit <code>/debug-throw</code> &rarr; styled comic 500 panel renders, not the default React error overlay.</li>
+              <li>Type a bad gameId at <code>/result/zzz</code> &rarr; expired page.</li>
+              <li>Try to share before a game ends (force navigation) &rarr; graceful guard, not a crash.</li>
+              <li>Open <code>/play</code>, answer "Don&rsquo;t know" enough that the engine eliminates all candidates &rarr; zero-belief state rendered with a friendly message + Play Again CTA.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 9 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1206,21 +1277,28 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Read <code>ca:history:v1</code> array. Cap at 20 entries; rotate oldest out on write in <code>gameStore</code>.</li>
-            <li>Render each as a card: character thumb, name, "Guessed in N" or "Stumped me", relative time ("3h ago" via <code>Intl.RelativeTimeFormat</code>, no extra dep).</li>
+            <li>Read <code>ca:history:v1</code>. Cap at 20 entries; rotate oldest out on write in <code>gameStore</code>.</li>
+            <li>Card per entry: character thumb, name, outcome label, relative time via <code>Intl.RelativeTimeFormat</code>.</li>
             <li>Click &rarr; <code>/result/[gameId]</code>.</li>
             <li>"Clear history" button with confirm.</li>
-            <li>Aggregate stats card at top: total games, win rate, average question count.</li>
+            <li>Stats card at top: total games, win rate, average question count.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>After playing 5 games, history shows all 5.</li>
-              <li>Stats card is correct.</li>
-              <li>Replay links land on result pages.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Play 5 games (mix wins + give-ups) &rarr; visit <code>/history</code> &rarr; 5 cards in reverse-chronological order.</li>
+              <li>Each card shows character thumbnail, name, outcome, "Xm ago" / "Xh ago".</li>
+              <li>Stats card at top is mathematically correct (total = 5, win rate matches, avg questions matches).</li>
+              <li>Click any card &rarr; lands on its result page with the right character.</li>
+              <li>Play 22 more games &rarr; history page shows only the most recent 20.</li>
+              <li>Click "Clear history" &rarr; confirm dialog &rarr; OK &rarr; list empties, empty state renders.</li>
+              <li>Stats card after clear: total = 0, no NaN values.</li>
+              <li>Refresh &rarr; still empty.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1231,7 +1309,7 @@
   <section class="phase" data-phase="week4">
     <div class="phase-head">
       <span class="label">WEEK 4</span>
-      <h2 class="phase-title">Test, Tune, Deploy, Launch</h2>
+      <h2 class="phase-title">Tune, Test, Deploy, Launch</h2>
       <span class="phase-meta">Goal: live on the internet</span>
       <div class="phase-mini-progress"><div class="phase-mini-fill"></div></div>
     </div>
@@ -1253,22 +1331,26 @@
           <h4>Step-by-step</h4>
           <ol>
             <li>Run <code>npm run sim</code> &mdash; check baseline from M1.5.</li>
-            <li>Look at the top-20 failures. Are they failing because of <strong>(a)</strong> sparse trait data, <strong>(b)</strong> ambiguous questions, or <strong>(c)</strong> the engine not driving enough info-gain from available traits?</li>
-            <li>For (a): backfill trait values for those specific characters in <code>characters.json</code>.</li>
-            <li>For (b): rewrite the offending question or add a sharper alternative; bump <code>cost</code> of the ambiguous one.</li>
+            <li>Look at the top-20 failures. Are they failing because of <strong>(a)</strong> sparse trait data, <strong>(b)</strong> ambiguous questions, or <strong>(c)</strong> the engine not driving info-gain from available traits?</li>
+            <li>For (a): backfill traits for those characters in <code>characters.json</code>.</li>
+            <li>For (b): rewrite the offending question, or bump its <code>cost</code>.</li>
             <li>For (c): tune the diversity penalty (try 0.8 &harr; 0.9) and the guess threshold parameters.</li>
-            <li>Iterate. Commit a sim report alongside any tuning change so you can see the curve.</li>
-            <li>Add a CI step (GitHub Actions) running <code>npm run sim -- --ci</code> that exits nonzero if accuracy regresses by &gt;3% from <code>sim-report.json</code> on main.</li>
+            <li>Iterate. Commit a sim report alongside each tuning change so you can see the curve.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>&ge;85% accuracy and &le;22 avg questions on the 500-char set with noise=0.</li>
-              <li>&ge;75% / &le;24 with noise=0.1.</li>
-              <li>CI regression gate is live.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run sim</code> &rarr; accuracy &ge; 85%, avg questions &le; 22, P95 &le; 25.</li>
+              <li>Run <code>npm run sim -- --noise=0.1</code> &rarr; accuracy &ge; 75%, avg questions &le; 24.</li>
+              <li>Open <code>sim-report.json</code> diff vs. the previous commit &rarr; numbers moved in the right direction.</li>
+              <li>Pick 3 characters from the previous failures list &rarr; play <code>npm run play -- --target={id}</code> manually &rarr; engine now succeeds within 25 turns.</li>
+              <li>Pick 3 random characters and play them by hand &mdash; the engine&rsquo;s questions still feel natural and not redundant.</li>
+              <li>Run sim one final time after the last tuning change &rarr; numbers stable across two consecutive runs (no random regressions).</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 6 tests pass; targets hit.</p></div>
         </div></div>
       </div>
 
@@ -1277,35 +1359,66 @@
         <div class="milestone-row">
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
-            <div><span class="ms-id">M4.2</span><span class="ms-title">Playwright E2E suite</span></div>
-            <div class="ms-desc">Happy path, give-up, share, resume, offline. All green in CI.</div>
+            <div><span class="ms-id">M4.2</span><span class="ms-title">Manual release-test checklist</span></div>
+            <div class="ms-desc">A single repeatable hand-run pass covering every critical path before deploy.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
         <div class="ms-details"><div class="ms-details-inner">
-          <p><span class="badge badge-time">~5h</span></p>
+          <p><span class="badge badge-time">~3h to write + ~30 min per release-pass</span></p>
 
-          <h4>Specs to write</h4>
+          <h4>Goal</h4>
+          <p>A single checklist you run by hand before every deploy. No frameworks &mdash; just you, two browsers, two devices, and a printable checklist.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Create <code>RELEASE-CHECKLIST.md</code> in the repo root.</li>
+            <li>Add a section per critical path (Happy path, Wrong-guess loop, Give-up + top-5, Search modal, Resume, Share, History, Offline, Onboarding, Error boundary).</li>
+            <li>Each item is a one-line "do X &rarr; see Y" check with a checkbox.</li>
+            <li>Add a device matrix table: each browser/device combo gets a column &mdash; you tick each item off per column.</li>
+          </ol>
+
+          <h4>Device + browser matrix</h4>
           <ul>
-            <li><code>e2e/happy-path.spec.ts</code> &mdash; play through, answer Yes to guess, see result, share button visible.</li>
-            <li><code>e2e/give-up.spec.ts</code> &mdash; force engine to fail (mock belief), trigger give-up, pick top-5 character, land on result.</li>
-            <li><code>e2e/resume.spec.ts</code> &mdash; start game, navigate away, return &rarr; resume banner appears.</li>
-            <li><code>e2e/share-image.spec.ts</code> &mdash; <code>page.request.get('/api/share-image?c=spider-man&amp;n=12&amp;o=won')</code> returns PNG bytes &gt; 50KB.</li>
-            <li><code>e2e/offline.spec.ts</code> &mdash; <code>context.setOffline(true)</code>, refresh, game still playable.</li>
-            <li><code>e2e/a11y.spec.ts</code> &mdash; axe scan on each route.</li>
+            <li>Desktop Chrome (latest)</li>
+            <li>Desktop Firefox (latest)</li>
+            <li>Desktop Safari (if you have a Mac) or Edge</li>
+            <li>Mobile Chrome on Android (your phone)</li>
+            <li>Mobile Safari on iOS (a friend&rsquo;s phone or BrowserStack free trial &mdash; only if free)</li>
           </ul>
 
-          <h4>CI</h4>
-          <ol>
-            <li>GitHub Actions workflow <code>.github/workflows/ci.yml</code>: install &rarr; build &rarr; unit &rarr; e2e (chromium + webkit) &rarr; sim regression.</li>
-            <li>Upload Playwright traces on failure for debugging.</li>
-          </ol>
+          <div class="testing-block">
+            <h4 class="testing">The release-pass itself (run before every deploy)</h4>
+            <ol>
+              <li><strong>Cold start.</strong> Clear site data. Visit <code>/</code> &rarr; onboarding shows.</li>
+              <li><strong>Happy path.</strong> Play, think of Spider-Man, answer truthfully &rarr; engine guesses Spider-Man &rarr; <code>/result</code> renders.</li>
+              <li><strong>Wrong-guess loop.</strong> Play, answer No to the first guess &rarr; engine continues, eventually lands.</li>
+              <li><strong>Give-up &rarr; top-5.</strong> Force 3 wrong guesses &rarr; <code>/give-up</code> &rarr; pick one &rarr; result.</li>
+              <li><strong>Give-up &rarr; search reveal.</strong> Force give-up &rarr; "Someone else" &rarr; type "batman" &rarr; pick &rarr; result.</li>
+              <li><strong>Resume.</strong> Mid-game, hard refresh &rarr; resume banner &rarr; Resume &rarr; continue.</li>
+              <li><strong>Start over.</strong> Mid-game, hard refresh &rarr; Start over &rarr; fresh game.</li>
+              <li><strong>Share image.</strong> Win, click Share &rarr; URL works in incognito; opens with og:image preview in social validator.</li>
+              <li><strong>History.</strong> After 3 games, <code>/history</code> shows 3 cards in order with correct stats.</li>
+              <li><strong>Clear history.</strong> Click Clear &rarr; empty state.</li>
+              <li><strong>Offline.</strong> Production build, install PWA, go offline, play one game start-to-finish.</li>
+              <li><strong>404.</strong> Visit <code>/some-fake-route</code> &rarr; off-panel 404.</li>
+              <li><strong>Error boundary.</strong> Visit <code>/debug-throw</code> &rarr; comic 500 panel.</li>
+              <li><strong>Keyboard-only.</strong> Unplug mouse, complete a game from <code>/</code> to <code>/result</code> using only keys.</li>
+              <li><strong>Reduced motion.</strong> Toggle in DevTools, play one full game &rarr; no jank, no broken transitions.</li>
+              <li><strong>Mobile portrait.</strong> 360px viewport &rarr; play a full game; nothing overflows.</li>
+              <li><strong>Mobile landscape.</strong> Rotate phone mid-game &rarr; layout adapts, game state preserved.</li>
+              <li><strong>Real iOS Safari.</strong> Play a game on a real iPhone.</li>
+              <li><strong>Real Android Chrome.</strong> Play a game on a real Android.</li>
+              <li><strong>Lighthouse smoke.</strong> Run Lighthouse on production preview, all 4 categories &ge; 90.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
-              <li>All 6 E2E specs green locally + in CI.</li>
-              <li>CI takes &lt; 5 min total.</li>
+              <li><code>RELEASE-CHECKLIST.md</code> committed.</li>
+              <li>You&rsquo;ve completed one full pass across at least 3 browser/device columns with every box ticked.</li>
+              <li>Any failures get logged as bugs and fixed before this milestone closes.</li>
             </ul>
           </div>
         </div></div>
@@ -1326,28 +1439,30 @@
 
           <h4>Tactics</h4>
           <ul>
-            <li><strong>Images:</strong> use <code>next/image</code> for character art with width/height set; preload only the current-question hint image.</li>
-            <li><strong>Fonts:</strong> <code>display: swap</code> + only Bangers 400 weight loaded.</li>
+            <li><strong>Images:</strong> <code>next/image</code> for character art with width/height set; preload only the current-question hint image.</li>
+            <li><strong>Fonts:</strong> <code>display: swap</code>, only Bangers 400 loaded.</li>
             <li><strong>JS bundle:</strong> dynamic-import Framer Motion + Lottie + fuse.js; verify with <code>@next/bundle-analyzer</code>. Target &lt; 200 KB JS gzipped.</li>
             <li><strong>SEO:</strong> proper <code>title</code> + <code>description</code> per route, Open Graph tags, canonical URL, <code>sitemap.xml</code> + <code>robots.txt</code>.</li>
-            <li><strong>Best Practices:</strong> CSP headers via <code>next.config.ts</code>, no console errors, HTTPS only (Vercel default).</li>
+            <li><strong>Best Practices:</strong> CSP headers via <code>next.config.ts</code>, no console errors, HTTPS only.</li>
           </ul>
 
-          <h4>Verify</h4>
-          <ol>
-            <li>Add <code>@lhci/cli</code>: <code>npm i -D @lhci/cli</code>.</li>
-            <li>GitHub Actions job runs <code>lhci autorun</code> against the preview deploy on each PR.</li>
-            <li>Fail the build if any category &lt; 90.</li>
-          </ol>
-
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>All 4 Lighthouse categories &ge; 90 on <code>/</code> and <code>/play</code>.</li>
-              <li>TTFQ &lt; 1s on simulated Fast 3G.</li>
-              <li>LHCI gates active in CI.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Build production: <code>npm run build &amp;&amp; npm start</code>.</li>
+              <li>Chrome &rarr; DevTools &rarr; Lighthouse &rarr; "Mobile" preset &rarr; analyze <code>/</code> &rarr; all four scores &ge; 90.</li>
+              <li>Repeat for <code>/play</code> &mdash; all four &ge; 90.</li>
+              <li>Repeat for <code>/result/[id]</code> with a real game &rarr; all four &ge; 90.</li>
+              <li>DevTools &rarr; Network &rarr; throttle "Fast 3G" &rarr; cold-load <code>/play</code> &rarr; first question visible in &lt; 1s.</li>
+              <li>Run bundle analyzer: <code>ANALYZE=true npm run build</code> &rarr; total JS gzipped &le; 200 KB.</li>
+              <li>View source on <code>/</code> &rarr; <code>title</code>, <code>description</code>, OG tags, canonical present.</li>
+              <li>Visit <code>/robots.txt</code> and <code>/sitemap.xml</code> &rarr; both render correct content.</li>
+              <li>DevTools console on every route &rarr; zero errors, zero warnings.</li>
+              <li>Repeat Lighthouse runs after every later milestone &mdash; numbers should not regress below 90.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 10 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1366,28 +1481,33 @@
 
           <h4>Umami (free Cloud hobby tier &mdash; 10k events/mo)</h4>
           <ol>
-            <li>Sign up at <a href="https://cloud.umami.is">cloud.umami.is</a>, create a website, copy the <code>data-website-id</code>.</li>
+            <li>Sign up at <a href="https://cloud.umami.is">cloud.umami.is</a>, create a website, copy <code>data-website-id</code>.</li>
             <li>Add the script tag to <code>layout.tsx</code> (no cookies, GDPR-friendly).</li>
-            <li>Emit custom events via <code>umami.track('event_name', { props })</code>: <code>game_start</code>, <code>game_end</code> (with <code>outcome</code>, <code>question_count</code>), <code>share_click</code>, <code>character_miss</code> (with <code>character_id</code>).</li>
-            <li>Confirm events arriving in the Umami dashboard.</li>
+            <li>Emit custom events via <code>umami.track('event_name', { props })</code>: <code>game_start</code>, <code>game_end</code> (with <code>outcome</code>, <code>question_count</code>), <code>share_click</code>, <code>character_miss</code>.</li>
           </ol>
 
           <h4>Sentry (free Developer tier)</h4>
           <ol>
-            <li>Sign up at <a href="https://sentry.io">sentry.io</a> &mdash; choose "Next.js".</li>
-            <li><code>npx @sentry/wizard@latest -i nextjs</code> &mdash; it scaffolds <code>sentry.client.config.ts</code>, <code>sentry.server.config.ts</code>, <code>sentry.edge.config.ts</code>.</li>
-            <li>Set <code>tracesSampleRate</code> low (0.1) so we don&rsquo;t blow the free quota (5k errors + limited perf events/mo).</li>
-            <li>Add a <code>/debug-throw</code> route in dev only that throws on render &mdash; visit to verify Sentry catches it.</li>
+            <li>Sign up at <a href="https://sentry.io">sentry.io</a> &mdash; pick "Next.js".</li>
+            <li><code>npx @sentry/wizard@latest -i nextjs</code>.</li>
+            <li>Set <code>tracesSampleRate: 0.1</code> so we don&rsquo;t blow free quota.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Umami dashboard shows a real game-end event from your own test.</li>
-              <li>Sentry captures a forced throw with stack trace + source maps.</li>
-              <li>Neither hits a paid tier; both are confirmed free.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Play a full game on production preview.</li>
+              <li>Within 5 min, open Umami dashboard &rarr; see your page views + a <code>game_start</code> event + a <code>game_end</code> event with the correct <code>question_count</code> prop.</li>
+              <li>Click the share button on result page &rarr; <code>share_click</code> event appears within 5 min.</li>
+              <li>Force a give-up flow &rarr; <code>character_miss</code> event appears.</li>
+              <li>Visit <code>/debug-throw</code> on a deployed preview &rarr; within 1 min, Sentry shows the error with full stack + source maps.</li>
+              <li>Sentry &rarr; Project Settings &rarr; quota usage &lt; 1% of free tier.</li>
+              <li>Umami &rarr; account &rarr; usage &lt; 1% of 10k monthly events.</li>
+              <li>Inspect Network tab during a real session &rarr; only the Umami beacon + occasional Sentry envelope; no third-party trackers.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass; both services confirmed on free tier with no card on file.</p></div>
         </div></div>
       </div>
 
@@ -1406,20 +1526,26 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>AppShell</code> footer: "Comic Akinator is an unofficial fan project. Marvel and DC characters are property of their respective owners. No affiliation."</li>
-            <li><code>/privacy</code> page in plain language: what's stored locally (game state, history, miss queue), what's sent to Umami (page views + 4 custom events, no PII), what's sent to Sentry (error stack traces + browser metadata, no PII).</li>
-            <li><code>/about</code> page lists data sources + credits (Kaggle, Superhero API, Wikipedia, Fandom, LottieFiles).</li>
-            <li>No cookie banner required: Umami is cookieless; Sentry uses no advertising IDs; <code>localStorage</code> is first-party functional storage and exempt under GDPR ePrivacy.</li>
+            <li>Footer disclaimer in <code>AppShell</code>: "Comic Akinator is an unofficial fan project. Marvel and DC characters are property of their respective owners. No affiliation."</li>
+            <li><code>/privacy</code>: what&rsquo;s stored locally (game state, history, miss queue), what goes to Umami (page views + 4 events, no PII), what goes to Sentry (stack traces, browser metadata, no PII).</li>
+            <li><code>/about</code>: data source credits (Kaggle, Superhero API, Wikipedia, LottieFiles).</li>
+            <li>No cookie banner required: Umami is cookieless, Sentry uses no ad IDs, <code>localStorage</code> is first-party functional storage (GDPR ePrivacy exempt).</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>Disclaimer visible site-wide.</li>
-              <li><code>/privacy</code> and <code>/about</code> reachable from the footer.</li>
-              <li>You&rsquo;ve read the privacy text top-to-bottom and it's accurate.</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Read <code>/privacy</code> top-to-bottom out loud &rarr; every claim is factually true of the current build.</li>
+              <li>Read <code>/about</code> &rarr; every data source you actually used is credited; none are missing.</li>
+              <li>Footer disclaimer visible on every one of the 7 routes (check each).</li>
+              <li>Privacy + About both reachable from the footer with a single click.</li>
+              <li>DevTools &rarr; Application &rarr; Cookies on production URL &rarr; empty (or only essential first-party).</li>
+              <li>DevTools &rarr; Network &rarr; no third-party tracker calls beyond Umami + Sentry (no Google/Facebook/Hotjar/etc.).</li>
+              <li>Run the page through Google&rsquo;s Mobile-Friendly + Rich Results tests &rarr; no policy violations flagged.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 7 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1441,21 +1567,35 @@
             <li>Sign in to <a href="https://vercel.com">vercel.com</a> with GitHub. Free Hobby plan.</li>
             <li>Import the <code>comic-akinator</code> repo. Framework auto-detected as Next.js.</li>
             <li>Project name: <code>comic-akinator</code> &rarr; production URL <code>comic-akinator.vercel.app</code>.</li>
-            <li>Add env vars in Vercel UI: <code>NEXT_PUBLIC_SITE_URL</code> = production URL, <code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</code>, <code>SENTRY_DSN</code>, <code>SENTRY_AUTH_TOKEN</code> (for source-map upload during build, scope to org+project only).</li>
-            <li>Verify preview deploys: open a draft PR &rarr; check the auto-generated preview URL works.</li>
-            <li>Smoke test production: play 3 games on phone + desktop. Share to your own Twitter/X and confirm card renders.</li>
-            <li>Tag the release: <code>git tag v1.0.0 &amp;&amp; git push --tags</code>.</li>
-            <li>Add the live URL to the GitHub repo About + README.</li>
-            <li>Update memory: production URL is live.</li>
+            <li>Add env vars: <code>NEXT_PUBLIC_SITE_URL</code>, <code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</code>, <code>SENTRY_DSN</code>, <code>SENTRY_AUTH_TOKEN</code> (scoped).</li>
+            <li>You handle the git push + PR opening for preview-deploy verification.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (launch-day pass)</h4>
+            <ol>
+              <li>Visit <code>https://comic-akinator.vercel.app</code> &rarr; loads in &lt; 2s on Fast 3G; fonts swap in cleanly.</li>
+              <li>Run the full <code>RELEASE-CHECKLIST.md</code> (M4.2) against the production URL &mdash; every box ticks.</li>
+              <li>Open a draft PR on GitHub &rarr; Vercel posts a preview URL within 2 min &rarr; preview works.</li>
+              <li>Play a full game on a real iPhone (Safari) &rarr; works.</li>
+              <li>Play a full game on a real Android (Chrome) &rarr; works.</li>
+              <li>Click Share on the result page on each phone &rarr; native share sheet opens.</li>
+              <li>Paste the result URL into Twitter/X compose &rarr; card preview shows the right character image + copy.</li>
+              <li>Verify Umami dashboard records the new production-domain visits.</li>
+              <li>Verify Sentry shows zero unexpected errors after a 10-minute play session.</li>
+              <li>Confirm Vercel billing page shows $0 used, no credit card required.</li>
+              <li>Lighthouse on production &rarr; all four &ge; 90.</li>
+              <li>Final pass: tag the release on your end and update the GitHub repo About + README with the live URL.</li>
+            </ol>
+          </div>
 
           <div class="accept">
             <p><strong>Done when:</strong></p>
             <ul>
+              <li>All 12 launch-day tests pass.</li>
               <li><code>comic-akinator.vercel.app</code> serves the production build.</li>
               <li>Drafting a PR produces a working preview URL.</li>
               <li>You&rsquo;ve played and shared from a real phone.</li>
-              <li>v1.0.0 tagged on GitHub.</li>
             </ul>
           </div>
         </div></div>
@@ -1494,27 +1634,35 @@
           <p><span class="badge badge-time">~20h</span><span class="badge badge-risk">important</span></p>
 
           <h4>Strategy</h4>
-          <p>The MVP shipped 500 well-traited characters. Adding 2500 more with sparse traits will hurt engine accuracy unless we&rsquo;re careful. The plan is to enrich in waves and gate each by simulation.</p>
+          <p>The MVP shipped 500 well-traited characters. Adding 2500 more with sparse traits will hurt engine accuracy unless we&rsquo;re careful. Enrich in waves, gate each by simulation.</p>
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><strong>Wave A &mdash; tier 2 popularity (next 500):</strong> Extend <code>build-dataset.ts</code> to take the next-most-popular 500 characters from Superhero API + Kaggle. Run sim &mdash; expect a 5&ndash;10pt accuracy drop.</li>
-            <li><strong>Trait backfill from Fandom infoboxes:</strong> Build <code>scripts/enrich-from-fandom.ts</code>. For each character with &lt; 12 known traits, fetch their Fandom page, parse the infobox HTML, map fields to your traits.</li>
-            <li><strong>Wave B &mdash; long tail (2000 more):</strong> Add the remainder. Mark them as <code>tier: 'deep_cut'</code>.</li>
+            <li><strong>Wave A &mdash; tier 2 popularity (+500):</strong> extend <code>build-dataset.ts</code> to include the next-most-popular 500. Run sim &mdash; expect 5&ndash;10pt drop.</li>
+            <li><strong>Trait backfill from Fandom infoboxes:</strong> <code>scripts/enrich-from-fandom.ts</code> fetches Fandom pages, parses infobox HTML, maps fields to traits.</li>
+            <li><strong>Wave B &mdash; long tail (+2000):</strong> add the remainder. Mark them as <code>tier: 'deep_cut'</code>.</li>
             <li><strong>Difficulty toggle on landing:</strong> "Just the famous ones" (tier 1, default) vs "Include deep cuts" (all tiers). Filter the engine&rsquo;s pool at game start.</li>
-            <li><strong>Re-tune costs:</strong> Some questions that worked at 500 chars will be weaker at 3000 &mdash; re-run M4.1&rsquo;s tuning loop.</li>
-            <li><strong>Image pipeline cost:</strong> 3000 hot-linked images is fine; Wikipedia handles it. If Fandom rate-limits, fall back to silhouettes.</li>
+            <li><strong>Re-tune costs:</strong> some questions weaker at 3000 chars &mdash; re-run M4.1&rsquo;s tuning loop.</li>
+            <li>If <code>characters.json</code> grows past 1 MB, split into <code>tier1.json</code> + <code>tier2.json</code>, lazy-load tier 2.</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong></p>
-            <ul>
-              <li>3000+ characters live in <code>characters.json</code>.</li>
-              <li>Sim: &ge;85% on tier 1 (unchanged from MVP), &ge;65% on full pool.</li>
-              <li>Difficulty toggle works.</li>
-              <li>Bundle size still acceptable (move dataset to a separate <code>/data</code> fetch if it grows past 1 MB).</li>
-            </ul>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Run <code>npm run dataset:build</code> with the expanded sources &rarr; ~3000 characters in <code>characters.json</code>.</li>
+              <li>Run <code>npm run dataset:validate</code> &rarr; passes.</li>
+              <li>Spot-check 30 random tier-2 / deep-cut characters &rarr; image URLs load, names are correctly spelled, publisher is right.</li>
+              <li>Run <code>npm run sim</code> filtered to tier 1 only &rarr; &ge; 85% (unchanged from MVP).</li>
+              <li>Run <code>npm run sim</code> on full pool &rarr; &ge; 65%.</li>
+              <li>Visit production preview &rarr; landing page shows difficulty toggle.</li>
+              <li>Pick "Just the famous ones" &rarr; play, only tier 1 characters get guessed.</li>
+              <li>Pick "Include deep cuts" &rarr; play, deeper-cut characters appear in guesses.</li>
+              <li>Lighthouse still &ge; 90 (verify dataset size didn&rsquo;t tank Performance).</li>
+              <li>Re-run RELEASE-CHECKLIST.md &mdash; nothing regresses.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 10 tests pass; 3000+ characters live; difficulty toggle works.</p></div>
         </div></div>
       </div>
 
@@ -1533,16 +1681,28 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Daily seed: <code>YYYY-MM-DD</code> &rarr; hash &rarr; pick character from tier 1 pool (deterministic, no server state needed).</li>
-            <li>Reverse mode: the user thinks they know who it is &mdash; they answer the engine's questions as that character would &mdash; the engine guesses. (Slightly different framing than classic.)</li>
-            <li>Wordle-style result share: emoji grid mapping each answer (&#x1F7E9;=Yes, &#x1F7E8;=Probably, &#x2B1C;=DK, &#x1F7E5;=Probably-not, &#x1F7EB;=No), question count, link.</li>
-            <li>"Played today" lockout via <code>localStorage</code>.</li>
-            <li>Past-day archive (rolling 30 days) for replay.</li>
+            <li>Daily seed: <code>YYYY-MM-DD</code> &rarr; hash &rarr; pick character from tier 1 (deterministic, no server state).</li>
+            <li>Reverse framing: user thinks they know who it is &mdash; answers as that character would &mdash; engine guesses.</li>
+            <li>Wordle-style emoji share: &#x1F7E9;=Yes, &#x1F7E8;=Probably, &#x2B1C;=DK, &#x1F7E5;=Probably-not, &#x1F7EB;=No + question count + link.</li>
+            <li>"Played today" lockout via <code>localStorage</code> key <code>ca:daily:{date}</code>.</li>
+            <li>Past-day archive (rolling 30 days).</li>
           </ol>
 
-          <div class="accept">
-            <p><strong>Done when:</strong> Daily routes work, share grid matches Wordle&rsquo;s feel, no two users see different characters on the same day.</p>
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Open <code>/daily</code> in Chrome and Firefox on the same day &rarr; same character.</li>
+              <li>Open <code>/daily</code> on a friend&rsquo;s device the same day &rarr; same character.</li>
+              <li>Finish today&rsquo;s daily &rarr; lockout message until midnight; replay button disabled.</li>
+              <li>Set system clock forward one day, reload &rarr; new daily unlocks.</li>
+              <li>Open share &rarr; copies an emoji grid that pastes correctly into Twitter/X / WhatsApp / iMessage.</li>
+              <li>Visit <code>/daily/archive/2026-01-15</code> &rarr; plays that day&rsquo;s puzzle.</li>
+              <li>Visit <code>/daily/archive/1999-01-01</code> (outside 30-day window) &rarr; "not in archive" page.</li>
+              <li>Lighthouse on <code>/daily</code> &ge; 90.</li>
+            </ol>
           </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1563,10 +1723,26 @@
           <ol>
             <li>Define packs in <code>data/packs.json</code>: <code>{ id, name, filter: { teams?, adaptations?, publishers? } }</code>.</li>
             <li>Landing page tile grid for pack selection.</li>
-            <li>Engine accepts an optional <code>poolFilter</code> at game start; everything else stays the same.</li>
+            <li>Engine accepts an optional <code>poolFilter</code> at game start.</li>
             <li>Per-pack stats in history.</li>
-            <li>Re-tune sim per pack &mdash; some small packs may need fewer questions on average.</li>
+            <li>Re-tune sim per pack &mdash; some small packs may need fewer questions.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Visit <code>/</code> &rarr; tile grid shows at least 4 packs with thumbnails + names.</li>
+              <li>Click "X-Men" &rarr; play; every guess (including the right one) is an X-Men character.</li>
+              <li>Click "Bat-Family" &rarr; play; same check.</li>
+              <li>Click "MCU only" &rarr; play; only characters with MCU adaptation appear.</li>
+              <li>Run <code>npm run sim -- --pack=x-men</code> &rarr; &ge; 90% accuracy (smaller pool, easier).</li>
+              <li>History page shows pack label per game.</li>
+              <li>Result page shows "in the X-Men pack" attribution.</li>
+              <li>Picking a pack with &lt; 10 characters shows a guard "pack too small to play".</li>
+            </ol>
+          </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1585,13 +1761,28 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Install Payload CMS in the same Next project. Storage: LibSQL via Turso (free tier: 9 GB, plenty).</li>
-            <li>Import existing <code>characters.json</code> into the DB once via a migration script.</li>
-            <li>Build admin schema mirroring the character + trait + question shapes.</li>
-            <li>Password-gated <code>/admin</code> route. Single admin user, env-var password hash. No public signup.</li>
+            <li>Install Payload CMS in the Next project. Storage: LibSQL via Turso (free: 9 GB).</li>
+            <li>Import <code>characters.json</code> into the DB via a migration script.</li>
+            <li>Admin schema mirrors character + trait + question shapes.</li>
+            <li>Password-gated <code>/admin</code>. Single admin user, env-var password hash. No public signup.</li>
             <li>On save, re-export DB &rarr; <code>characters.json</code> via a build hook so production stays a static bundle.</li>
-            <li>Verify Turso usage stays under free quota with current traffic.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Visit <code>/admin</code> without auth &rarr; redirected to login.</li>
+              <li>Login with wrong password &rarr; rejected with generic error.</li>
+              <li>Login correctly &rarr; admin dashboard.</li>
+              <li>Edit a character&rsquo;s trait (e.g. set Spider-Man&rsquo;s "has cape" = false) &rarr; save &rarr; trigger rebuild.</li>
+              <li>After rebuild, visit production &rarr; updated trait is live.</li>
+              <li>Try to access <code>/admin/api/...</code> endpoints with no token &rarr; 401.</li>
+              <li>Turso dashboard &rarr; usage &lt; 5% of 9 GB free tier.</li>
+              <li>Logout &rarr; redirected to landing; can&rsquo;t re-enter admin without re-login.</li>
+            </ol>
+          </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass; Turso confirmed on free tier.</p></div>
         </div></div>
       </div>
 
@@ -1610,12 +1801,29 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li><code>/suggest</code> route with a form: character name, "wrong trait" + "correct value", optional email.</li>
+            <li><code>/suggest</code> form: character name, "wrong trait" + "correct value", optional email.</li>
             <li>Server action writes to a <code>suggestions</code> table.</li>
             <li>Resend free tier (3000 emails/mo) emails you on each submission.</li>
             <li>Admin queue UI: approve &rarr; auto-apply the trait change. Reject &rarr; mark closed.</li>
-            <li>Rate-limit by IP via Vercel KV free tier (also has a free quota) or a simple in-memory map in serverless &mdash; pick whichever stays free.</li>
+            <li>Rate-limit by IP via Vercel KV free tier or in-memory map &mdash; whichever stays free.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Submit a suggestion as a non-admin user &rarr; success page renders.</li>
+              <li>Within 5 min, receive an email notification (check inbox + spam).</li>
+              <li>Login to <code>/admin/suggestions</code> &rarr; submission appears in queue with all fields.</li>
+              <li>Click Approve &rarr; the trait change is applied to the character DB.</li>
+              <li>Visit production &rarr; trait reflects the change after the next rebuild.</li>
+              <li>Submit 10 suggestions from one IP within a minute &rarr; rate-limiter blocks #6+.</li>
+              <li>Submit gibberish in fields &rarr; validation rejects.</li>
+              <li>Reject a suggestion &rarr; status updates to "rejected"; user sees nothing changes.</li>
+              <li>Resend dashboard &rarr; usage &lt; 1% of 3000/mo.</li>
+            </ol>
+          </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 9 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1625,7 +1833,7 @@
           <div class="ms-checkbox" data-toggle="check"></div>
           <div class="ms-content" data-toggle="expand">
             <div><span class="ms-id">P2.6</span><span class="ms-title">Learning queue dashboard</span></div>
-            <div class="ms-desc">Locally-logged misses + admin-curated suggestions feed weight tuning.</div>
+            <div class="ms-desc">Logged misses + admin suggestions feed weight tuning.</div>
           </div>
           <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
         </div>
@@ -1634,12 +1842,28 @@
 
           <h4>Step-by-step</h4>
           <ol>
-            <li>Add an opt-in toggle ("share my misses to improve the game") on the result page when a game is lost.</li>
+            <li>Add opt-in toggle ("share my misses to improve the game") on the result page when a game is lost.</li>
             <li>If on, <code>POST /api/log-miss</code> writes to the DB with no PII.</li>
-            <li>Admin dashboard view: top-missed characters, common question paths that lead to give-up.</li>
-            <li>For each, a one-click "open in trait editor" action to fix data quickly.</li>
-            <li>Run sim after each batch to confirm regressions don&rsquo;t sneak in.</li>
+            <li>Admin dashboard: top-missed characters, common question paths leading to give-up.</li>
+            <li>One-click "open in trait editor" action.</li>
+            <li>Run sim after each batch to confirm no regressions.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Lose a game with the opt-in toggle OFF &rarr; nothing sent (verify in Network tab).</li>
+              <li>Lose a game with the toggle ON &rarr; <code>/api/log-miss</code> POST appears in Network with no PII in payload.</li>
+              <li>Login to <code>/admin/learning</code> &rarr; the miss appears in the dashboard within 1 min.</li>
+              <li>Top-missed list ranks characters by miss count.</li>
+              <li>Click a character &rarr; opens its trait editor pre-filled.</li>
+              <li>Edit a trait &rarr; save &rarr; trigger rebuild &rarr; run sim &rarr; that character&rsquo;s metric improves.</li>
+              <li>Network &rarr; confirm no third-party trackers added.</li>
+              <li>Turso usage still &lt; 10% of free tier.</li>
+            </ol>
+          </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 8 tests pass.</p></div>
         </div></div>
       </div>
 
@@ -1675,11 +1899,21 @@
         <div class="ms-details"><div class="ms-details-inner">
           <h4>Sketch</h4>
           <ol>
-            <li>Introduce an <code>entityType: 'character' | 'team'</code> dimension.</li>
+            <li>Introduce <code>entityType: 'character' | 'team'</code> dimension.</li>
             <li>Team-specific traits: founding era, headquarters, leader, membership scale.</li>
-            <li>Engine adds an early-branch question: <em>"Are you thinking of a group of heroes, not a single person?"</em></li>
+            <li>Engine adds an early branch: <em>"Are you thinking of a group of heroes, not a single person?"</em></li>
             <li>Pool split / re-rank at game start.</li>
           </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (sketch)</h4>
+            <ol>
+              <li>Play one game thinking of the Avengers &rarr; engine asks the "team?" branch within first 3 questions &rarr; lands on Avengers.</li>
+              <li>Play one game thinking of Iron Man &rarr; engine doesn&rsquo;t mistake him for the Avengers.</li>
+              <li>Sim run with teams included &rarr; team-game accuracy reported separately.</li>
+              <li>Result page renders team layout (member thumbnails) correctly.</li>
+            </ol>
+          </div>
         </div></div>
       </div>
 
@@ -1695,7 +1929,17 @@
         </div>
         <div class="ms-details"><div class="ms-details-inner">
           <h4>Sketch</h4>
-          <p>Pure client-side. Player A picks a character on a private screen (their phone), passes the device to Player B. The engine asks B questions; B watches as the engine tries to guess what A is thinking. Rewards correct calls; tracks streaks.</p>
+          <p>Pure client-side. Player A picks a character on a private screen, passes device to Player B. Engine asks B questions; B watches engine try to guess A&rsquo;s pick. Tracks streaks.</p>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (sketch)</h4>
+            <ol>
+              <li>On a single device, complete a full A&rarr;B handoff flow &rarr; pick screen blanks before pass.</li>
+              <li>Engine never reveals A&rsquo;s pick to B except via guess.</li>
+              <li>Win/loss correctly recorded for both players in history.</li>
+              <li>Streak counter increments on consecutive wins, resets on loss.</li>
+            </ol>
+          </div>
         </div></div>
       </div>
 
@@ -1711,7 +1955,17 @@
         </div>
         <div class="ms-details"><div class="ms-details-inner">
           <h4>Sketch</h4>
-          <p>Collect a corpus of complete games (answers + revealed character). Fit per-character trait certainties by minimizing simulated mis-guess rate via gradient descent on the trait matrix. Run in CI weekly. Output: a new <code>characters.json</code> diff for review. No runtime ML &mdash; the engine stays simple and explainable.</p>
+          <p>Collect complete games (answers + revealed character). Fit per-character trait certainties by minimizing simulated mis-guess rate via gradient descent on the trait matrix. Run weekly. Output: a <code>characters.json</code> diff for review. No runtime ML.</p>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (sketch)</h4>
+            <ol>
+              <li>Seed the queue with 200 fake games. Run the batch &rarr; produces a diff.</li>
+              <li>Apply the diff &rarr; re-run sim &rarr; accuracy &uarr; vs. pre-diff baseline.</li>
+              <li>Diff includes a human-readable summary of which traits moved most.</li>
+              <li>Sanity-check 10 random changes by hand &rarr; none nonsensical (e.g. Superman shouldn&rsquo;t lose "flight").</li>
+            </ol>
+          </div>
         </div></div>
       </div>
 
@@ -1727,7 +1981,17 @@
         </div>
         <div class="ms-details"><div class="ms-details-inner">
           <h4>Sketch</h4>
-          <p>Only worth doing if there&rsquo;s real demand. Auth.js + GitHub OAuth (free) + Turso for sync. History + daily streak migrates from <code>localStorage</code> on first sign-in. Anonymous play remains the default.</p>
+          <p>Only if there&rsquo;s demand. Auth.js + GitHub OAuth (free) + Turso for sync. History + daily streak migrates from <code>localStorage</code> on first sign-in. Anonymous play remains default.</p>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (sketch)</h4>
+            <ol>
+              <li>Sign in with GitHub on a fresh device &rarr; OAuth flow completes; history is empty.</li>
+              <li>Play 3 games &rarr; sign out &rarr; sign in on second device &rarr; same 3 games appear.</li>
+              <li>Anonymous user with local history signs in for first time &rarr; local history migrates to cloud.</li>
+              <li>Delete account from settings &rarr; cloud data wiped within 30 days (Turso row removed immediately).</li>
+            </ol>
+          </div>
         </div></div>
       </div>
 
@@ -1743,7 +2007,19 @@
         </div>
         <div class="ms-details"><div class="ms-details-inner">
           <h4>Sketch</h4>
-          <p>If the project earns it (real traffic, portfolio interview asks for it), graduate from <code>comic-akinator.vercel.app</code> to a real domain. Cost: ~$10&ndash;15/yr. Would be the only paid line item in the project budget &mdash; needs explicit go from you given the $0 constraint.</p>
+          <p>If the project earns it, graduate from <code>comic-akinator.vercel.app</code> to a real domain. Cost: ~$10&ndash;15/yr. Only paid line item in the project &mdash; needs explicit go from you given the $0 constraint.</p>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing (sketch)</h4>
+            <ol>
+              <li>DNS resolves correctly globally (use a DNS checker).</li>
+              <li>HTTPS valid certificate (Vercel auto-provisions).</li>
+              <li>Redirect from <code>www.</code> to apex (or vice versa) works.</li>
+              <li>Old <code>*.vercel.app</code> URL redirects to new domain.</li>
+              <li>Umami + Sentry updated with new origin.</li>
+              <li>OG share images use new domain.</li>
+            </ol>
+          </div>
         </div></div>
       </div>
 
@@ -1751,7 +2027,8 @@
   </section>
 
   <footer>
-    <p>Click any tile to expand details &middot; check the box to mark done &middot; progress lives in <code>localStorage</code> under <code>ca:plan:v1</code>.</p>
+    <p>Click any tile to expand &middot; check the box to mark done &middot; progress lives in <code>localStorage</code> under <code>ca:plan:v1</code>.</p>
+    <p><strong style="color:var(--test)">Testing sections</strong> are highlighted in purple &mdash; run them by hand before checking the box.</p>
     <p>&copy; Comic Akinator &middot; Fan project. Marvel and DC characters belong to their respective owners.</p>
   </footer>
 
@@ -1761,7 +2038,9 @@
 (function() {
   var STORAGE_KEY = 'ca:plan:v1';
   var EXPANDED_KEY = 'ca:plan:expanded:v1';
+  var PHASE_COLLAPSED_KEY = 'ca:plan:phaseCollapsed:v1';
   var allMs = document.querySelectorAll('.milestone');
+  var allPhases = document.querySelectorAll('.phase');
   var fill = document.getElementById('fill');
   var pctEl = document.getElementById('pct');
   var doneCountEl = document.getElementById('done-count');
@@ -1783,7 +2062,19 @@
 
   var doneState = load(STORAGE_KEY);
   var expandState = load(EXPANDED_KEY);
+  var phaseCollapsedState = load(PHASE_COLLAPSED_KEY);
   var prevPct = -1;
+
+  allPhases.forEach(function(phase) {
+    var head = phase.querySelector('.phase-head');
+    if (head && !head.querySelector('.phase-head-chevron')) {
+      var chev = document.createElement('span');
+      chev.className = 'phase-head-chevron';
+      chev.setAttribute('aria-hidden', 'true');
+      chev.textContent = '▾';
+      head.appendChild(chev);
+    }
+  });
 
   function render() {
     var doneTotal = 0;
@@ -1809,6 +2100,7 @@
       var ratio = s.total ? (s.done / s.total) : 0;
       fillEl.style.width = (ratio * 100) + '%';
       phaseEl.classList.toggle('completed', ratio === 1);
+      phaseEl.classList.toggle('collapsed', !!phaseCollapsedState[phase]);
     });
 
     var pct = Math.round((doneTotal / allMs.length) * 100);
@@ -1854,6 +2146,18 @@
         save(EXPANDED_KEY, expandState);
         render();
       });
+    });
+  });
+
+  allPhases.forEach(function(phase) {
+    var phaseId = phase.dataset.phase;
+    var head = phase.querySelector('.phase-head');
+    if (!head) return;
+    head.addEventListener('click', function() {
+      if (phaseCollapsedState[phaseId]) { delete phaseCollapsedState[phaseId]; }
+      else { phaseCollapsedState[phaseId] = true; }
+      save(PHASE_COLLAPSED_KEY, phaseCollapsedState);
+      render();
     });
   });
 
