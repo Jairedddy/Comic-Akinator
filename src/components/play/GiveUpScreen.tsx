@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGameStore } from "@/state/gameStore";
-import type { Character } from "@/lib/engine/types";
+import { CharacterSearchModal } from "./CharacterSearchModal";
+import { appendMiss, type MissAsked } from "@/lib/misses";
+import type { Character, HistoryEntry } from "@/lib/engine/types";
 
 const EMPTY_CHARS: readonly Character[] = [];
+const EMPTY_HISTORY: readonly HistoryEntry[] = [];
 
-// M2.4 stub: shows "Got me", lists the engine's top-5 suspects, and offers a
-// Play Again button. M2.5 turns the list into a selectable picker + search and
-// wires the reveal action through the store's reveal() call.
 export function GiveUpScreen() {
   const router = useRouter();
   const hydrated = useGameStore((s) => s.hydrated);
@@ -20,8 +20,19 @@ export function GiveUpScreen() {
   );
   const candidateIds = useGameStore((s) => s.giveUpCandidateIds);
   const characters = useGameStore((s) => s.characters);
+  const historyRef = useGameStore(
+    (s) => s.engineCore?.history as readonly HistoryEntry[] | undefined,
+  );
+  const gameId = useGameStore((s) => s.gameId);
   const ensureLoaded = useGameStore((s) => s.ensureLoaded);
   const startGame = useGameStore((s) => s.startGame);
+  const reveal = useGameStore((s) => s.reveal);
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  // Bumped each time the search modal opens so CharacterSearchModal remounts
+  // with a fresh query state (avoids a setState-in-effect inside the modal).
+  const [searchOpenCount, setSearchOpenCount] = useState(0);
+  const someoneElseBtnRef = useRef<HTMLButtonElement>(null);
 
   const candidates = useMemo<readonly Character[]>(() => {
     if (!characters || candidateIds.length === 0) return EMPTY_CHARS;
@@ -33,7 +44,6 @@ export function GiveUpScreen() {
     return out;
   }, [characters, candidateIds]);
 
-  // Re-hydrate the dataset if the user opened /give-up directly after a reload.
   useEffect(() => {
     if (!hydrated) return;
     if (!characters) void ensureLoaded();
@@ -43,15 +53,44 @@ export function GiveUpScreen() {
   // back to /play so a fresh game starts.
   useEffect(() => {
     if (!hydrated) return;
-    if (status !== "giveup" && status !== "lost") {
+    if (status === "lost") {
+      // reveal() ran below; let the navigation effect there route us.
+      return;
+    }
+    if (status !== "giveup") {
       router.replace("/play");
     }
   }, [hydrated, status, router]);
 
-  if (!hydrated || status !== "giveup") {
-    return (
-      <Panel kicker="…" title="LOADING…" />
-    );
+  function handleReveal(characterId: string) {
+    // Snapshot the asked/answer pair BEFORE reveal() so the miss log reflects
+    // the give-up moment, not the lost-state aftermath.
+    const history = historyRef ?? EMPTY_HISTORY;
+    const richHistory: MissAsked[] = history.map((h) => ({
+      questionId: h.questionId,
+      trait: h.trait,
+      category: h.category,
+      answer: h.answer,
+    }));
+    if (gameId) {
+      appendMiss({
+        gameId,
+        characterId,
+        asked: history.map((h) => h.questionId),
+        answers: history.map((h) => h.answer),
+        history: richHistory,
+        at: new Date().toISOString(),
+      });
+    }
+    reveal(characterId);
+    setSearchOpen(false);
+    // The result page reads status + pendingGuess from the store; navigate
+    // once reveal has set status to "lost".
+    if (gameId) router.replace(`/result/${gameId}`);
+  }
+
+  if (!hydrated || (status !== "giveup" && status !== "lost")) {
+    return <Panel kicker="…" title="LOADING…" />;
   }
 
   const reason =
@@ -73,34 +112,94 @@ export function GiveUpScreen() {
       </h1>
       <p className="text-ink-dim mt-4 text-sm">{reason}</p>
 
-      {candidates.length > 0 && (
-        <>
-          <p className="text-ink-dimmer mt-6 text-xs tracking-[0.2em] uppercase">
-            My top suspects (M2.5 turns this into a picker):
-          </p>
-          <ul className="mt-2 grid gap-2">
-            {candidates.map((c) => (
-              <li
-                key={c.id}
-                className="border-border-soft bg-bg-card flex items-center gap-3 border p-2"
-              >
-                <span className="font-display text-ink text-lg">{c.name}</span>
-                <span className="text-ink-dimmer text-xs">{c.publisher}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+      <p className="text-ink-dimmer mt-6 text-xs tracking-[0.2em] uppercase">
+        My closest hunches — pick the one you had in mind:
+      </p>
 
-      <button
-        type="button"
-        onClick={() => {
-          void startGame().then(() => router.replace("/play"));
+      <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+        {candidates.map((c) => (
+          <li key={c.id}>
+            <button
+              type="button"
+              onClick={() => handleReveal(c.id)}
+              aria-label={`Reveal: it was ${c.name}`}
+              className={[
+                "group border-border-soft bg-bg-card hover:border-accent",
+                "flex w-full flex-col overflow-hidden border-2 text-left transition-colors",
+                "focus-visible:ring-accent focus-visible:ring-offset-bg-detail",
+                "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+              ].join(" ")}
+            >
+              <div className="bg-bg relative aspect-[5/6] w-full overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={c.image}
+                  alt=""
+                  aria-hidden
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = "/silhouette.svg";
+                  }}
+                  className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="px-2.5 py-2">
+                <div className="font-display text-ink text-sm leading-tight">
+                  {c.name}
+                </div>
+                <div className="text-ink-dimmer mt-0.5 text-[10px] uppercase tracking-wider">
+                  {c.publisher}
+                </div>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <button
+          ref={someoneElseBtnRef}
+          type="button"
+          onClick={() => {
+            setSearchOpenCount((n) => n + 1);
+            setSearchOpen(true);
+          }}
+          className={[
+            "border-accent text-accent hover:bg-accent hover:text-bg",
+            "font-display border-2 px-5 py-2 tracking-[2px] transition-colors",
+            "focus-visible:ring-accent focus-visible:ring-offset-bg-detail",
+            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+          ].join(" ")}
+        >
+          SOMEONE ELSE
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            void startGame().then(() => router.replace("/play"));
+          }}
+          className={[
+            "border-border-soft text-ink-dim hover:text-ink hover:border-accent",
+            "font-display border-2 px-5 py-2 tracking-[2px] transition-colors",
+            "focus-visible:ring-accent focus-visible:ring-offset-bg-detail",
+            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+          ].join(" ")}
+        >
+          PLAY AGAIN
+        </button>
+      </div>
+
+      <CharacterSearchModal
+        key={searchOpenCount}
+        open={searchOpen}
+        characters={characters ?? EMPTY_CHARS}
+        onPick={handleReveal}
+        onClose={() => {
+          setSearchOpen(false);
+          // Return focus to the trigger as the spec requires.
+          requestAnimationFrame(() => someoneElseBtnRef.current?.focus());
         }}
-        className="border-accent text-accent hover:bg-accent hover:text-bg font-display mt-6 inline-block border-2 px-5 py-2 tracking-[2px] transition-colors"
-      >
-        PLAY AGAIN
-      </button>
+      />
     </section>
   );
 }

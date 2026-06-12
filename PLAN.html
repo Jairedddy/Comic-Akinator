@@ -1034,6 +1034,48 @@
         </div></div>
       </div>
 
+      <!-- M2.7 -->
+      <div class="milestone" data-id="m2.7">
+        <div class="milestone-row">
+          <div class="ms-checkbox" data-toggle="check"></div>
+          <div class="ms-content" data-toggle="expand">
+            <div><span class="ms-id">M2.7</span><span class="ms-title">Question difficulty tiering</span></div>
+            <div class="ms-desc">Tag questions <code>easy</code> vs <code>nerdy</code>; engine holds nerdy ones in reserve until it misses once or hits a turn threshold. Keeps casual fans in the game without dumbing it down for diehards.</div>
+          </div>
+          <div class="ms-chevron" data-toggle="expand">&#x25BE;</div>
+        </div>
+        <div class="ms-details"><div class="ms-details-inner">
+          <p><span class="badge badge-time">~3h</span><span class="badge badge-risk">UX</span></p>
+
+          <h4>Why</h4>
+          <p>The current bank asks things like &ldquo;Did your character first appear during the Bronze Age (1970&ndash;1985)?&rdquo; or &ldquo;Does your character originate in Madripoor?&rdquo; &mdash; correct for the trait, useless for a player who just knows Spider-Man from the movies. A casual fan currently gets surfaced these in the first few turns because the entropy selector doesn&rsquo;t know they&rsquo;re hard. We need a softer ramp.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Extend <code>Question</code> type in <code>src/lib/engine/types.ts</code> with <code>difficulty: "easy" | "nerdy"</code>. Default to <code>"easy"</code> in the schema.</li>
+            <li>Hand-tag the ~20&ndash;25 nerdy questions in <code>data/questions.json</code>: all 10 <code>era</code> questions, obscure <code>origin-city</code> (Madripoor, Themyscira-as-trivia, Krypton specifics), <code>death-resurrection</code>, and niche <code>secret-identity</code>. Keep universe/alignment/gender/visible appearance/MCU&middot;DCEU adaptations as <code>easy</code>.</li>
+            <li>Validate at build time: extend <code>scripts/validate-dataset.ts</code> to enforce that every question carries a valid <code>difficulty</code> and that at least 60% are <code>easy</code>.</li>
+            <li>Update <code>src/lib/engine/select.ts</code>: filter the question pool to <code>easy</code>-only when <code>state.wrongGuesses.length === 0 &amp;&amp; state.turn &lt; NERDY_UNLOCK_TURN</code> (start at 12). Once unlocked, the full pool is in play.</li>
+            <li>If the easy pool exhausts before unlock, allow nerdy questions early (don&rsquo;t stall the engine).</li>
+            <li>Re-run <code>npm run sim</code>; expect avg questions to rise slightly on diehard targets but drop on mainstream ones. Adjust the unlock turn against the report.</li>
+          </ol>
+
+          <div class="testing-block">
+            <h4 class="testing">Manual Testing</h4>
+            <ol>
+              <li>Start a game, play through the first 10 turns &rarr; every question is answerable from movie/show knowledge (no era / no obscure city / no death-resurrection deep cuts).</li>
+              <li>Get to a wrong guess &rarr; from the next turn the question pool can include nerdy ones.</li>
+              <li>Run <code>npm run sim</code> &rarr; aggregate accuracy is &plusmn;3% of the pre-tiering baseline; report saved.</li>
+              <li>Pick a mainstream character (Spider-Man, Batman, Wonder Woman) &rarr; engine guesses in &le; 15 turns without ever asking an era question.</li>
+              <li>Pick an obscure character that needs nerdy traits to disambiguate &rarr; engine still reaches them; the nerdy question shows up only after the easy pool is mostly consumed or after a miss.</li>
+              <li><code>npm run dataset:validate</code> rejects a tampered <code>questions.json</code> with an invalid <code>difficulty</code>.</li>
+            </ol>
+          </div>
+
+          <div class="accept"><p><strong>Done when:</strong> all 6 tests pass.</p></div>
+        </div></div>
+      </div>
+
     </div>
   </section>
 
