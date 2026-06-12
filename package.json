@@ -10,6 +10,7 @@
     "sim": "tsx scripts/sim.ts",
     "dataset:build": "tsx scripts/build-dataset.ts",
     "dataset:validate": "tsx scripts/validate-dataset.ts",
+    "data:sync": "tsx scripts/sync-public-data.ts",
     "format": "prettier --write ."
   },
   "dependencies": {

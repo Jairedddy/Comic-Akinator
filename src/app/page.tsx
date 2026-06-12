@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { PlaceholderHero } from "@/components/layout/PlaceholderHero";
+import { ResumeBanner } from "@/components/landing/ResumeBanner";
 
 export default function Home() {
   return (
     <div className="flex flex-col gap-8">
+      <ResumeBanner />
       <PlaceholderHero kicker="20 Questions" title="THINK OF A HERO. OR A VILLAIN.">
         Marvel or DC. Comics, movies, shows, games — anything counts. I&apos;ll guess
         who you&apos;re thinking of in 20 questions or fewer.

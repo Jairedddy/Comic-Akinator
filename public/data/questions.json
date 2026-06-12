@@ -1,0 +1,1202 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "q-001",
+      "trait": "universe-marvel",
+      "category": "universe",
+      "text": "Does your character live in the Marvel Universe?",
+      "inverse": "Not from Marvel",
+      "cost": 1
+    },
+    {
+      "id": "q-002",
+      "trait": "universe-marvel",
+      "category": "universe",
+      "text": "Was your character first published by Marvel Comics?",
+      "inverse": "Not a Marvel character",
+      "cost": 1
+    },
+    {
+      "id": "q-003",
+      "trait": "universe-dc",
+      "category": "universe",
+      "text": "Does your character live in the DC Universe?",
+      "inverse": "Not from DC",
+      "cost": 1
+    },
+    {
+      "id": "q-004",
+      "trait": "universe-dc",
+      "category": "universe",
+      "text": "Is your character a DC Comics character?",
+      "inverse": "Not a DC character",
+      "cost": 1
+    },
+    {
+      "id": "q-005",
+      "trait": "universe-multiverse-crossover",
+      "category": "universe",
+      "text": "Has your character appeared in cross-publisher events between Marvel and DC?",
+      "inverse": "No cross-publisher events",
+      "cost": 1
+    },
+
+    {
+      "id": "q-006",
+      "trait": "alignment-hero",
+      "category": "alignment",
+      "text": "Is your character primarily a hero?",
+      "inverse": "Not primarily heroic",
+      "cost": 1
+    },
+    {
+      "id": "q-007",
+      "trait": "alignment-hero",
+      "category": "alignment",
+      "text": "Does your character fight on the side of good?",
+      "inverse": "Doesn't fight for good by default",
+      "cost": 1
+    },
+    {
+      "id": "q-008",
+      "trait": "alignment-villain",
+      "category": "alignment",
+      "text": "Is your character a villain?",
+      "inverse": "Not a villain",
+      "cost": 1
+    },
+    {
+      "id": "q-009",
+      "trait": "alignment-villain",
+      "category": "alignment",
+      "text": "Does your character primarily oppose the heroes?",
+      "inverse": "Doesn't primarily oppose heroes",
+      "cost": 1
+    },
+    {
+      "id": "q-010",
+      "trait": "alignment-antihero",
+      "category": "alignment",
+      "text": "Is your character morally ambiguous — neither clearly hero nor villain?",
+      "inverse": "Has a clear moral side",
+      "cost": 1
+    },
+    {
+      "id": "q-011",
+      "trait": "alignment-antihero",
+      "category": "alignment",
+      "text": "Does your character operate outside conventional morality?",
+      "inverse": "Operates within conventional morality",
+      "cost": 1
+    },
+    {
+      "id": "q-012",
+      "trait": "alignment-reformed-villain",
+      "category": "alignment",
+      "text": "Did your character begin as a villain and turn good later?",
+      "inverse": "Did not begin as a villain",
+      "cost": 1
+    },
+
+    {
+      "id": "q-013",
+      "trait": "gender-male",
+      "category": "gender",
+      "text": "Is your character male?",
+      "inverse": "Not male",
+      "cost": 1
+    },
+    {
+      "id": "q-014",
+      "trait": "gender-male",
+      "category": "gender",
+      "text": "Is your character generally referred to as 'he'?",
+      "inverse": "Not generally referred to as 'he'",
+      "cost": 1
+    },
+    {
+      "id": "q-015",
+      "trait": "gender-female",
+      "category": "gender",
+      "text": "Is your character female?",
+      "inverse": "Not female",
+      "cost": 1
+    },
+    {
+      "id": "q-016",
+      "trait": "gender-female",
+      "category": "gender",
+      "text": "Is your character generally referred to as 'she'?",
+      "inverse": "Not generally referred to as 'she'",
+      "cost": 1
+    },
+    {
+      "id": "q-017",
+      "trait": "gender-nonbinary-other",
+      "category": "gender",
+      "text": "Is your character non-binary or gender-undefined?",
+      "inverse": "Has a binary gender",
+      "cost": 1
+    },
+
+    {
+      "id": "q-018",
+      "trait": "species-human",
+      "category": "species",
+      "text": "Is your character an ordinary, fully human being?",
+      "inverse": "Not an ordinary human",
+      "cost": 1
+    },
+    {
+      "id": "q-019",
+      "trait": "species-human",
+      "category": "species",
+      "text": "Does your character lack any non-human origins?",
+      "inverse": "Has non-human origins",
+      "cost": 1
+    },
+    {
+      "id": "q-020",
+      "trait": "species-mutant",
+      "category": "species",
+      "text": "Was your character born with the X-gene — a mutant?",
+      "inverse": "Not a mutant",
+      "cost": 1
+    },
+    {
+      "id": "q-021",
+      "trait": "species-mutant",
+      "category": "species",
+      "text": "Did your character develop powers from birth, like an X-Men character?",
+      "inverse": "Did not develop powers from birth via mutation",
+      "cost": 1
+    },
+    {
+      "id": "q-022",
+      "trait": "species-alien",
+      "category": "species",
+      "text": "Is your character from another planet?",
+      "inverse": "Not extraterrestrial",
+      "cost": 1
+    },
+    {
+      "id": "q-023",
+      "trait": "species-alien",
+      "category": "species",
+      "text": "Does your character originate from outside Earth?",
+      "inverse": "Originates from Earth",
+      "cost": 1
+    },
+    {
+      "id": "q-024",
+      "trait": "species-deity",
+      "category": "species",
+      "text": "Is your character a god or deity?",
+      "inverse": "Not divine",
+      "cost": 1
+    },
+    {
+      "id": "q-025",
+      "trait": "species-deity",
+      "category": "species",
+      "text": "Does your character come from a mythological pantheon?",
+      "inverse": "Not from a mythological pantheon",
+      "cost": 1
+    },
+    {
+      "id": "q-026",
+      "trait": "species-android-robot",
+      "category": "species",
+      "text": "Is your character an android or robot?",
+      "inverse": "Not artificial",
+      "cost": 1
+    },
+    {
+      "id": "q-027",
+      "trait": "species-android-robot",
+      "category": "species",
+      "text": "Was your character built rather than born?",
+      "inverse": "Not built artificially",
+      "cost": 1
+    },
+    {
+      "id": "q-028",
+      "trait": "species-cyborg",
+      "category": "species",
+      "text": "Is your character a cyborg — part human, part machine?",
+      "inverse": "Not a cyborg",
+      "cost": 1
+    },
+    {
+      "id": "q-029",
+      "trait": "species-cyborg",
+      "category": "species",
+      "text": "Does your character have major mechanical or cybernetic parts replacing biological ones?",
+      "inverse": "Fully biological body",
+      "cost": 1
+    },
+    {
+      "id": "q-030",
+      "trait": "species-demon-supernatural",
+      "category": "species",
+      "text": "Does your character have a supernatural or demonic origin?",
+      "inverse": "Not supernatural",
+      "cost": 1
+    },
+    {
+      "id": "q-031",
+      "trait": "species-demon-supernatural",
+      "category": "species",
+      "text": "Is your character a ghost, demon, vampire, or similar?",
+      "inverse": "Not a supernatural creature",
+      "cost": 1
+    },
+    {
+      "id": "q-032",
+      "trait": "species-symbiote",
+      "category": "species",
+      "text": "Is your character a symbiote — an alien lifeform that bonds to a host?",
+      "inverse": "Not a symbiote",
+      "cost": 1
+    },
+    {
+      "id": "q-033",
+      "trait": "species-symbiote",
+      "category": "species",
+      "text": "Does your character's existence depend on bonding with another being?",
+      "inverse": "Doesn't bond as a symbiote",
+      "cost": 1
+    },
+    {
+      "id": "q-034",
+      "trait": "species-atlantean",
+      "category": "species",
+      "text": "Does your character hail from Atlantis?",
+      "inverse": "Not Atlantean",
+      "cost": 1
+    },
+    {
+      "id": "q-035",
+      "trait": "species-atlantean",
+      "category": "species",
+      "text": "Does your character live and breathe underwater by birth?",
+      "inverse": "Doesn't live underwater natively",
+      "cost": 1
+    },
+    {
+      "id": "q-036",
+      "trait": "species-cosmic-entity",
+      "category": "species",
+      "text": "Is your character a cosmic-scale abstract entity, like Galactus or Death?",
+      "inverse": "Not a cosmic abstract entity",
+      "cost": 1
+    },
+    {
+      "id": "q-037",
+      "trait": "species-cosmic-entity",
+      "category": "species",
+      "text": "Does your character embody a universal concept like death, infinity, or hunger?",
+      "inverse": "Not an embodiment of a universal concept",
+      "cost": 1
+    },
+    {
+      "id": "q-038",
+      "trait": "species-magical-being",
+      "category": "species",
+      "text": "Was your character born with magical powers — a natural-born sorcerer or witch?",
+      "inverse": "Not a natural-born magic user",
+      "cost": 1
+    },
+
+    {
+      "id": "q-039",
+      "trait": "power-super-strength",
+      "category": "powers",
+      "text": "Does your character possess superhuman strength?",
+      "inverse": "No superhuman strength",
+      "cost": 1
+    },
+    {
+      "id": "q-040",
+      "trait": "power-super-strength",
+      "category": "powers",
+      "text": "Could your character bend steel or lift a car bare-handed?",
+      "inverse": "Can't bend steel or lift cars",
+      "cost": 1
+    },
+    {
+      "id": "q-041",
+      "trait": "power-super-speed",
+      "category": "powers",
+      "text": "Does your character move at superhuman speeds?",
+      "inverse": "Moves at human speed",
+      "cost": 1
+    },
+    {
+      "id": "q-042",
+      "trait": "power-super-speed",
+      "category": "powers",
+      "text": "Can your character outrun a sports car?",
+      "inverse": "Can't outrun a sports car",
+      "cost": 1
+    },
+    {
+      "id": "q-043",
+      "trait": "power-super-durability",
+      "category": "powers",
+      "text": "Does your character have superhuman durability or toughness?",
+      "inverse": "Has human-level durability",
+      "cost": 1
+    },
+    {
+      "id": "q-044",
+      "trait": "power-super-durability",
+      "category": "powers",
+      "text": "Could your character shrug off small-arms fire?",
+      "inverse": "Vulnerable to bullets",
+      "cost": 1
+    },
+    {
+      "id": "q-045",
+      "trait": "power-super-intelligence",
+      "category": "powers",
+      "text": "Is your character a genius-level intellect?",
+      "inverse": "Average intellect",
+      "cost": 1
+    },
+    {
+      "id": "q-046",
+      "trait": "power-super-intelligence",
+      "category": "powers",
+      "text": "Is your character known for being one of the smartest people in their world?",
+      "inverse": "Not unusually intelligent",
+      "cost": 1
+    },
+    {
+      "id": "q-047",
+      "trait": "power-master-combatant",
+      "category": "powers",
+      "text": "Is your character a master of hand-to-hand combat?",
+      "inverse": "Not a master martial artist",
+      "cost": 1
+    },
+    {
+      "id": "q-048",
+      "trait": "power-master-combatant",
+      "category": "powers",
+      "text": "Could your character defeat a world-class fighter in unarmed combat?",
+      "inverse": "Couldn't beat a world-class fighter",
+      "cost": 1
+    },
+    {
+      "id": "q-049",
+      "trait": "power-cosmic-energy",
+      "category": "powers",
+      "text": "Can your character project cosmic-scale energy blasts?",
+      "inverse": "Doesn't project cosmic energy",
+      "cost": 1
+    },
+    {
+      "id": "q-050",
+      "trait": "power-cosmic-energy",
+      "category": "powers",
+      "text": "Does your character wield powers on a cosmic scale?",
+      "inverse": "Powers not cosmic-scale",
+      "cost": 1
+    },
+    {
+      "id": "q-051",
+      "trait": "power-no-superpowers",
+      "category": "powers",
+      "text": "Does your character lack any superhuman powers, relying only on skill or gear?",
+      "inverse": "Has superhuman powers",
+      "cost": 1
+    },
+    {
+      "id": "q-052",
+      "trait": "power-no-superpowers",
+      "category": "powers",
+      "text": "Is your character an ordinary human in terms of physical capability?",
+      "inverse": "Has superhuman physical capability",
+      "cost": 1
+    },
+    {
+      "id": "q-053",
+      "trait": "power-flight",
+      "category": "powers",
+      "text": "Can your character fly under their own power?",
+      "inverse": "Can't fly",
+      "cost": 1
+    },
+    {
+      "id": "q-054",
+      "trait": "power-telepathy",
+      "category": "powers",
+      "text": "Can your character read minds?",
+      "inverse": "Can't read minds",
+      "cost": 1
+    },
+    {
+      "id": "q-055",
+      "trait": "power-telekinesis",
+      "category": "powers",
+      "text": "Can your character move objects with their mind?",
+      "inverse": "No telekinesis",
+      "cost": 1
+    },
+    {
+      "id": "q-056",
+      "trait": "power-magic",
+      "category": "powers",
+      "text": "Does your character wield magic?",
+      "inverse": "Doesn't wield magic",
+      "cost": 1
+    },
+    {
+      "id": "q-057",
+      "trait": "power-elemental-control",
+      "category": "powers",
+      "text": "Can your character control a classical element — fire, water, earth, or air?",
+      "inverse": "No elemental control",
+      "cost": 1
+    },
+    {
+      "id": "q-058",
+      "trait": "power-regeneration",
+      "category": "powers",
+      "text": "Does your character have a rapid healing factor?",
+      "inverse": "Heals at human speed",
+      "cost": 1
+    },
+    {
+      "id": "q-059",
+      "trait": "power-shapeshifting",
+      "category": "powers",
+      "text": "Can your character change their physical form or appearance?",
+      "inverse": "Can't shapeshift",
+      "cost": 1
+    },
+    {
+      "id": "q-060",
+      "trait": "power-size-changing",
+      "category": "powers",
+      "text": "Can your character grow or shrink in size?",
+      "inverse": "No size manipulation",
+      "cost": 1
+    },
+    {
+      "id": "q-061",
+      "trait": "power-invisibility",
+      "category": "powers",
+      "text": "Can your character turn invisible?",
+      "inverse": "Can't turn invisible",
+      "cost": 1
+    },
+    {
+      "id": "q-062",
+      "trait": "power-teleportation",
+      "category": "powers",
+      "text": "Can your character teleport?",
+      "inverse": "Can't teleport",
+      "cost": 1
+    },
+    {
+      "id": "q-063",
+      "trait": "power-claws-blades",
+      "category": "powers",
+      "text": "Does your character have natural claws or bone blades?",
+      "inverse": "No natural claws or blades",
+      "cost": 1
+    },
+    {
+      "id": "q-064",
+      "trait": "power-web-spinning",
+      "category": "powers",
+      "text": "Can your character produce or shoot webs like a spider?",
+      "inverse": "No spider-like web powers",
+      "cost": 1
+    },
+    {
+      "id": "q-065",
+      "trait": "power-water-control",
+      "category": "powers",
+      "text": "Can your character control water or command sea life?",
+      "inverse": "No water-related powers",
+      "cost": 1
+    },
+    {
+      "id": "q-066",
+      "trait": "power-super-senses",
+      "category": "powers",
+      "text": "Does your character have heightened senses — sight, hearing, or smell?",
+      "inverse": "Has normal senses",
+      "cost": 1
+    },
+    {
+      "id": "q-067",
+      "trait": "power-time-manipulation",
+      "category": "powers",
+      "text": "Can your character manipulate time?",
+      "inverse": "Can't manipulate time",
+      "cost": 1
+    },
+    {
+      "id": "q-068",
+      "trait": "power-healing-others",
+      "category": "powers",
+      "text": "Can your character heal or empower other people?",
+      "inverse": "Can't heal others",
+      "cost": 1
+    },
+    {
+      "id": "q-069",
+      "trait": "power-bestial-features",
+      "category": "powers",
+      "text": "Does your character have animal-like features — fur, fangs, claws, or a tail?",
+      "inverse": "Has no animal-like features",
+      "cost": 1
+    },
+
+    {
+      "id": "q-070",
+      "trait": "equip-powered-armor",
+      "category": "equipment",
+      "text": "Does your character fight in a powered armor suit?",
+      "inverse": "No powered armor",
+      "cost": 1
+    },
+    {
+      "id": "q-071",
+      "trait": "equip-bow-arrows",
+      "category": "equipment",
+      "text": "Does your character wield a bow and arrows?",
+      "inverse": "Doesn't use a bow",
+      "cost": 1
+    },
+    {
+      "id": "q-072",
+      "trait": "equip-sword-blade",
+      "category": "equipment",
+      "text": "Does your character carry a sword or other bladed weapon?",
+      "inverse": "No sword or blade",
+      "cost": 1
+    },
+    {
+      "id": "q-073",
+      "trait": "equip-iconic-shield",
+      "category": "equipment",
+      "text": "Does your character carry an iconic shield as their main weapon?",
+      "inverse": "Doesn't carry a shield",
+      "cost": 1
+    },
+    {
+      "id": "q-074",
+      "trait": "equip-magic-weapon",
+      "category": "equipment",
+      "text": "Does your character wield a magical or enchanted weapon?",
+      "inverse": "No magical weapon",
+      "cost": 1
+    },
+    {
+      "id": "q-075",
+      "trait": "equip-utility-belt",
+      "category": "equipment",
+      "text": "Does your character use a utility belt of gadgets?",
+      "inverse": "No utility belt",
+      "cost": 1
+    },
+    {
+      "id": "q-076",
+      "trait": "equip-firearms",
+      "category": "equipment",
+      "text": "Does your character primarily fight with guns or firearms?",
+      "inverse": "Doesn't primarily use guns",
+      "cost": 1
+    },
+    {
+      "id": "q-077",
+      "trait": "equip-iconic-vehicle",
+      "category": "equipment",
+      "text": "Does your character have a famous personal vehicle?",
+      "inverse": "No iconic vehicle",
+      "cost": 1
+    },
+    {
+      "id": "q-078",
+      "trait": "equip-stealth-tech",
+      "category": "equipment",
+      "text": "Does your character rely on stealth gear or tech?",
+      "inverse": "Doesn't rely on stealth gear",
+      "cost": 1
+    },
+
+    {
+      "id": "q-079",
+      "trait": "team-avengers",
+      "category": "teams",
+      "text": "Is your character a member of the Avengers?",
+      "inverse": "Not an Avenger",
+      "cost": 1
+    },
+    {
+      "id": "q-080",
+      "trait": "team-justice-league",
+      "category": "teams",
+      "text": "Is your character a member of the Justice League?",
+      "inverse": "Not in the Justice League",
+      "cost": 1
+    },
+    {
+      "id": "q-081",
+      "trait": "team-x-men",
+      "category": "teams",
+      "text": "Is your character a member of the X-Men?",
+      "inverse": "Not an X-Man",
+      "cost": 1
+    },
+    {
+      "id": "q-082",
+      "trait": "team-fantastic-four",
+      "category": "teams",
+      "text": "Is your character a member of the Fantastic Four?",
+      "inverse": "Not in the Fantastic Four",
+      "cost": 1
+    },
+    {
+      "id": "q-083",
+      "trait": "team-guardians-of-galaxy",
+      "category": "teams",
+      "text": "Is your character a Guardian of the Galaxy?",
+      "inverse": "Not a Guardian of the Galaxy",
+      "cost": 1
+    },
+    {
+      "id": "q-084",
+      "trait": "team-bat-family",
+      "category": "teams",
+      "text": "Is your character part of the Bat-Family?",
+      "inverse": "Not in the Bat-Family",
+      "cost": 1
+    },
+    {
+      "id": "q-085",
+      "trait": "team-teen-titans",
+      "category": "teams",
+      "text": "Is your character a Teen Titan?",
+      "inverse": "Not a Teen Titan",
+      "cost": 1
+    },
+    {
+      "id": "q-086",
+      "trait": "team-defenders",
+      "category": "teams",
+      "text": "Is your character a member of the Defenders?",
+      "inverse": "Not in the Defenders",
+      "cost": 1
+    },
+    {
+      "id": "q-087",
+      "trait": "team-inhumans",
+      "category": "teams",
+      "text": "Is your character an Inhuman or member of the Inhumans?",
+      "inverse": "Not Inhuman",
+      "cost": 1
+    },
+    {
+      "id": "q-088",
+      "trait": "team-thunderbolts",
+      "category": "teams",
+      "text": "Is your character a member of the Thunderbolts?",
+      "inverse": "Not a Thunderbolt",
+      "cost": 1
+    },
+    {
+      "id": "q-089",
+      "trait": "team-suicide-squad",
+      "category": "teams",
+      "text": "Is your character a member of the Suicide Squad?",
+      "inverse": "Not in the Suicide Squad",
+      "cost": 1
+    },
+    {
+      "id": "q-090",
+      "trait": "team-birds-of-prey",
+      "category": "teams",
+      "text": "Is your character a member of the Birds of Prey?",
+      "inverse": "Not in Birds of Prey",
+      "cost": 1
+    },
+    {
+      "id": "q-091",
+      "trait": "team-shield",
+      "category": "teams",
+      "text": "Is your character a S.H.I.E.L.D. operative?",
+      "inverse": "Not S.H.I.E.L.D.",
+      "cost": 1
+    },
+    {
+      "id": "q-092",
+      "trait": "team-young-justice",
+      "category": "teams",
+      "text": "Is your character a member of Young Justice?",
+      "inverse": "Not in Young Justice",
+      "cost": 1
+    },
+    {
+      "id": "q-093",
+      "trait": "team-no-team",
+      "category": "teams",
+      "text": "Does your character operate solo, with no team affiliation?",
+      "inverse": "Has team affiliations",
+      "cost": 1
+    },
+
+    {
+      "id": "q-094",
+      "trait": "era-golden-age",
+      "category": "era",
+      "text": "Did your character first appear during the Golden Age of comics (1938–1956)?",
+      "inverse": "Did not debut in the Golden Age",
+      "cost": 1
+    },
+    {
+      "id": "q-095",
+      "trait": "era-golden-age",
+      "category": "era",
+      "text": "Was your character created before 1956?",
+      "inverse": "Created in 1956 or later",
+      "cost": 1
+    },
+    {
+      "id": "q-096",
+      "trait": "era-silver-age",
+      "category": "era",
+      "text": "Did your character first appear during the Silver Age of comics (1956–1970)?",
+      "inverse": "Did not debut in the Silver Age",
+      "cost": 1
+    },
+    {
+      "id": "q-097",
+      "trait": "era-silver-age",
+      "category": "era",
+      "text": "Was your character created between 1956 and 1970?",
+      "inverse": "Not created between 1956 and 1970",
+      "cost": 1
+    },
+    {
+      "id": "q-098",
+      "trait": "era-bronze-age",
+      "category": "era",
+      "text": "Did your character first appear during the Bronze Age (1970–1985)?",
+      "inverse": "Did not debut in the Bronze Age",
+      "cost": 1
+    },
+    {
+      "id": "q-099",
+      "trait": "era-bronze-age",
+      "category": "era",
+      "text": "Was your character introduced in the 1970s or early 1980s?",
+      "inverse": "Not introduced in the 1970s or early 1980s",
+      "cost": 1
+    },
+    {
+      "id": "q-100",
+      "trait": "era-modern-age",
+      "category": "era",
+      "text": "Did your character first appear during the Modern Age (1985–2000)?",
+      "inverse": "Did not debut in the Modern Age",
+      "cost": 1
+    },
+    {
+      "id": "q-101",
+      "trait": "era-modern-age",
+      "category": "era",
+      "text": "Was your character introduced in the late 1980s or 1990s?",
+      "inverse": "Not introduced in the late 1980s or 1990s",
+      "cost": 1
+    },
+    {
+      "id": "q-102",
+      "trait": "era-recent",
+      "category": "era",
+      "text": "Did your character first appear in the year 2000 or later?",
+      "inverse": "Created before 2000",
+      "cost": 1
+    },
+    {
+      "id": "q-103",
+      "trait": "era-recent",
+      "category": "era",
+      "text": "Is your character a 21st-century creation?",
+      "inverse": "Predates the 21st century",
+      "cost": 1
+    },
+
+    {
+      "id": "q-104",
+      "trait": "eyes-blue",
+      "category": "appearance",
+      "text": "Does your character have blue eyes?",
+      "inverse": "Doesn't have blue eyes",
+      "cost": 1
+    },
+    {
+      "id": "q-105",
+      "trait": "eyes-brown",
+      "category": "appearance",
+      "text": "Does your character have brown eyes?",
+      "inverse": "Doesn't have brown eyes",
+      "cost": 1
+    },
+    {
+      "id": "q-106",
+      "trait": "eyes-green",
+      "category": "appearance",
+      "text": "Does your character have green eyes?",
+      "inverse": "Doesn't have green eyes",
+      "cost": 1
+    },
+    {
+      "id": "q-107",
+      "trait": "eyes-unusual",
+      "category": "appearance",
+      "text": "Does your character have unusual eye colour — red, yellow, white, or glowing?",
+      "inverse": "Has a normal eye colour",
+      "cost": 1
+    },
+    {
+      "id": "q-108",
+      "trait": "hair-black",
+      "category": "appearance",
+      "text": "Does your character have black hair?",
+      "inverse": "Doesn't have black hair",
+      "cost": 1
+    },
+    {
+      "id": "q-109",
+      "trait": "hair-blonde",
+      "category": "appearance",
+      "text": "Does your character have blonde hair?",
+      "inverse": "Doesn't have blonde hair",
+      "cost": 1
+    },
+    {
+      "id": "q-110",
+      "trait": "hair-red",
+      "category": "appearance",
+      "text": "Does your character have red or auburn hair?",
+      "inverse": "Doesn't have red or auburn hair",
+      "cost": 1
+    },
+    {
+      "id": "q-111",
+      "trait": "hair-brown",
+      "category": "appearance",
+      "text": "Does your character have brown hair?",
+      "inverse": "Doesn't have brown hair",
+      "cost": 1
+    },
+    {
+      "id": "q-112",
+      "trait": "hair-bald",
+      "category": "appearance",
+      "text": "Is your character bald or hairless?",
+      "inverse": "Has hair",
+      "cost": 1
+    },
+    {
+      "id": "q-113",
+      "trait": "skin-non-human-color",
+      "category": "appearance",
+      "text": "Does your character have non-human skin colour — green, blue, red, or otherwise?",
+      "inverse": "Has human-like skin colour",
+      "cost": 1
+    },
+    {
+      "id": "q-114",
+      "trait": "physique-imposing",
+      "category": "appearance",
+      "text": "Does your character have a notably large or muscular build?",
+      "inverse": "Does not have an unusually large or muscular build",
+      "cost": 1
+    },
+    {
+      "id": "q-115",
+      "trait": "has-facial-hair",
+      "category": "appearance",
+      "text": "Does your character have a beard or mustache?",
+      "inverse": "Clean-shaven",
+      "cost": 1
+    },
+
+    {
+      "id": "q-116",
+      "trait": "costume-red",
+      "category": "costume",
+      "text": "Is your character's costume primarily red?",
+      "inverse": "Costume is not primarily red",
+      "cost": 1
+    },
+    {
+      "id": "q-117",
+      "trait": "costume-blue",
+      "category": "costume",
+      "text": "Is your character's costume primarily blue?",
+      "inverse": "Costume is not primarily blue",
+      "cost": 1
+    },
+    {
+      "id": "q-118",
+      "trait": "costume-black",
+      "category": "costume",
+      "text": "Is your character's costume primarily black?",
+      "inverse": "Costume is not primarily black",
+      "cost": 1
+    },
+    {
+      "id": "q-119",
+      "trait": "costume-green",
+      "category": "costume",
+      "text": "Is your character's costume primarily green?",
+      "inverse": "Costume is not primarily green",
+      "cost": 1
+    },
+    {
+      "id": "q-120",
+      "trait": "costume-yellow",
+      "category": "costume",
+      "text": "Is your character's costume primarily yellow?",
+      "inverse": "Costume is not primarily yellow",
+      "cost": 1
+    },
+    {
+      "id": "q-121",
+      "trait": "costume-cape",
+      "category": "costume",
+      "text": "Does your character wear a cape?",
+      "inverse": "Doesn't wear a cape",
+      "cost": 1
+    },
+    {
+      "id": "q-122",
+      "trait": "costume-mask",
+      "category": "costume",
+      "text": "Does your character wear a face mask?",
+      "inverse": "No face mask",
+      "cost": 1
+    },
+    {
+      "id": "q-123",
+      "trait": "costume-cowl",
+      "category": "costume",
+      "text": "Does your character wear a cowl that covers the head?",
+      "inverse": "No cowl",
+      "cost": 1
+    },
+    {
+      "id": "q-124",
+      "trait": "costume-chest-symbol",
+      "category": "costume",
+      "text": "Does your character have a chest emblem or insignia?",
+      "inverse": "No chest emblem",
+      "cost": 1
+    },
+    {
+      "id": "q-125",
+      "trait": "costume-helmet",
+      "category": "costume",
+      "text": "Does your character wear a full helmet?",
+      "inverse": "No helmet",
+      "cost": 1
+    },
+
+    {
+      "id": "q-126",
+      "trait": "identity-secret",
+      "category": "secret-identity",
+      "text": "Does your character maintain a secret identity?",
+      "inverse": "No secret identity",
+      "cost": 1
+    },
+    {
+      "id": "q-127",
+      "trait": "identity-secret",
+      "category": "secret-identity",
+      "text": "Is your character's real name unknown to the public in their world?",
+      "inverse": "Real name is public knowledge",
+      "cost": 1
+    },
+    {
+      "id": "q-128",
+      "trait": "identity-public",
+      "category": "secret-identity",
+      "text": "Is your character's identity publicly known?",
+      "inverse": "Identity is hidden from the public",
+      "cost": 1
+    },
+    {
+      "id": "q-129",
+      "trait": "identity-public",
+      "category": "secret-identity",
+      "text": "Does the public in your character's world know who they really are?",
+      "inverse": "Public doesn't know who they really are",
+      "cost": 1
+    },
+
+    {
+      "id": "q-130",
+      "trait": "origin-new-york",
+      "category": "origin-city",
+      "text": "Is your character based in New York City?",
+      "inverse": "Not from New York",
+      "cost": 1
+    },
+    {
+      "id": "q-131",
+      "trait": "origin-gotham",
+      "category": "origin-city",
+      "text": "Is your character from Gotham City?",
+      "inverse": "Not from Gotham",
+      "cost": 1
+    },
+    {
+      "id": "q-132",
+      "trait": "origin-metropolis",
+      "category": "origin-city",
+      "text": "Is your character from Metropolis?",
+      "inverse": "Not from Metropolis",
+      "cost": 1
+    },
+    {
+      "id": "q-133",
+      "trait": "origin-london-uk",
+      "category": "origin-city",
+      "text": "Is your character from London or the United Kingdom?",
+      "inverse": "Not from the UK",
+      "cost": 1
+    },
+    {
+      "id": "q-134",
+      "trait": "origin-asgard",
+      "category": "origin-city",
+      "text": "Is your character from Asgard?",
+      "inverse": "Not Asgardian",
+      "cost": 1
+    },
+    {
+      "id": "q-135",
+      "trait": "origin-atlantis",
+      "category": "origin-city",
+      "text": "Does your character come from Atlantis?",
+      "inverse": "Not from Atlantis",
+      "cost": 1
+    },
+    {
+      "id": "q-136",
+      "trait": "origin-outer-space",
+      "category": "origin-city",
+      "text": "Is your character from another planet or outer space?",
+      "inverse": "Not from outer space",
+      "cost": 1
+    },
+    {
+      "id": "q-137",
+      "trait": "origin-rural-small-town",
+      "category": "origin-city",
+      "text": "Is your character from a small town or rural area?",
+      "inverse": "Not from a small town",
+      "cost": 1
+    },
+    {
+      "id": "q-138",
+      "trait": "origin-other-dimension",
+      "category": "origin-city",
+      "text": "Is your character from another dimension?",
+      "inverse": "Not from another dimension",
+      "cost": 1
+    },
+    {
+      "id": "q-139",
+      "trait": "origin-future-time-traveler",
+      "category": "origin-city",
+      "text": "Is your character a time traveler from the future?",
+      "inverse": "Not from the future",
+      "cost": 1
+    },
+
+    {
+      "id": "q-140",
+      "trait": "adapt-mcu-film",
+      "category": "adaptations",
+      "text": "Has your character appeared in the Marvel Cinematic Universe films?",
+      "inverse": "Not in MCU films",
+      "cost": 1
+    },
+    {
+      "id": "q-141",
+      "trait": "adapt-dceu-film",
+      "category": "adaptations",
+      "text": "Has your character appeared in the DC Extended Universe films?",
+      "inverse": "Not in DCEU films",
+      "cost": 1
+    },
+    {
+      "id": "q-142",
+      "trait": "adapt-live-action-tv",
+      "category": "adaptations",
+      "text": "Has your character headlined a live-action television series?",
+      "inverse": "Not headlined a live-action TV series",
+      "cost": 1
+    },
+    {
+      "id": "q-143",
+      "trait": "adapt-animated-series",
+      "category": "adaptations",
+      "text": "Has your character headlined a major animated series?",
+      "inverse": "Not a famous animated lead",
+      "cost": 1
+    },
+    {
+      "id": "q-144",
+      "trait": "adapt-video-game-protagonist",
+      "category": "adaptations",
+      "text": "Has your character headlined a video game?",
+      "inverse": "Not a video game protagonist",
+      "cost": 1
+    },
+    {
+      "id": "q-145",
+      "trait": "adapt-merchandise-icon",
+      "category": "adaptations",
+      "text": "Is your character a major presence on merchandise — toys, lunchboxes, t-shirts?",
+      "inverse": "Not a merchandise icon",
+      "cost": 1
+    },
+
+    {
+      "id": "q-146",
+      "trait": "dr-died-in-canon",
+      "category": "death-resurrection",
+      "text": "Has your character died in main comics canon?",
+      "inverse": "Has never died in canon",
+      "cost": 1
+    },
+    {
+      "id": "q-147",
+      "trait": "dr-resurrected",
+      "category": "death-resurrection",
+      "text": "Has your character been resurrected after dying?",
+      "inverse": "Has not been resurrected",
+      "cost": 1
+    },
+    {
+      "id": "q-148",
+      "trait": "dr-currently-alive",
+      "category": "death-resurrection",
+      "text": "Is your character currently alive in canon?",
+      "inverse": "Currently dead in canon",
+      "cost": 1
+    }
+  ]
+}

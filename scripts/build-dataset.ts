@@ -19,6 +19,7 @@ import {
   slugify,
 } from "./lib/normalize";
 import { deriveTraits } from "./lib/derive-traits";
+import { syncPublicData } from "./sync-public-data";
 
 type SuperheroEntry = {
   id: number;
@@ -399,6 +400,9 @@ function main(): void {
       `    ${c.name.padEnd(30)} ${c.publisher.padEnd(7)} ${c.appearances ?? "?"} appearances`,
     );
   }
+
+  console.log("\nMirroring data/ → public/data/ for runtime fetching…");
+  syncPublicData(true);
 }
 
 main();
