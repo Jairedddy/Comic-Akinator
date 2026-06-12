@@ -48,6 +48,7 @@ type PersistedSlice = {
   pendingGuess: { characterId: string; confidence: number } | null;
   giveUpCandidateIds: { id: string; belief: number }[];
   startedAt: string | null;
+  gameId: string | null;
 };
 
 type RuntimeSlice = {
@@ -76,6 +77,7 @@ const INITIAL_PERSISTED: PersistedSlice = {
   pendingGuess: null,
   giveUpCandidateIds: [],
   startedAt: null,
+  gameId: null,
 };
 
 const INITIAL_RUNTIME: RuntimeSlice = {
@@ -166,6 +168,7 @@ export const useGameStore = create<Store>()(
           ...INITIAL_PERSISTED,
           engineCore: toCore(initial),
           startedAt: new Date().toISOString(),
+          gameId: crypto.randomUUID(),
           ...applyDecision(decision),
         });
       },
@@ -193,13 +196,18 @@ export const useGameStore = create<Store>()(
       },
 
       confirmGuess: (correct: boolean) => {
-        const { engineCore, characters, questions, pendingGuess, status } = get();
+        const { engineCore, characters, questions, pendingGuess, status, gameId } = get();
         if (status !== "guessing" || !pendingGuess) return;
         if (!engineCore || !characters || !questions) return;
         if (correct) {
-          // M2.6 will route to /result/[id] from here. For M2.3 we just flag
-          // status='won' so the UI can render a placeholder reveal.
-          set({ status: "won" });
+          // PlayScreen watches status==='won' + gameId and routes to
+          // /result/[gameId]. Guard against a missing gameId (older persisted
+          // games from pre-M2.4 sessions) so the player never gets stranded
+          // on the REVEALING transition panel.
+          set({
+            status: "won",
+            gameId: gameId ?? crypto.randomUUID(),
+          });
           return;
         }
         const full = toFull(engineCore, characters);
@@ -257,7 +265,11 @@ export const useGameStore = create<Store>()(
     }),
     {
       name: "ca:game:v1",
-      version: 1,
+      // Bumped to 2 in M2.4: added persisted gameId. Zustand discards state on
+      // version mismatch when no migrate() is supplied, which is what we want —
+      // anyone with a v1 game in progress gets a clean slate so the new
+      // /result/[gameId] route always has an id to navigate to.
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       // Persist only the user's progress. Runtime dataset + load-error flags
       // are NOT persisted — they get rebuilt by ensureLoaded() on rehydrate.
@@ -268,6 +280,7 @@ export const useGameStore = create<Store>()(
         pendingGuess: state.pendingGuess,
         giveUpCandidateIds: state.giveUpCandidateIds,
         startedAt: state.startedAt,
+        gameId: state.gameId,
       }),
       onRehydrateStorage: () => (state) => {
         // After rehydration completes, mark hydrated so SSR/CSR can branch

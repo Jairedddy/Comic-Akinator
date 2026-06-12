@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { QuestionCard } from "./QuestionCard";
 import { AnswerButtonRow } from "./AnswerButtonRow";
 import { ProgressDots } from "./ProgressDots";
 import { HintLine } from "./HintLine";
+import { GuessReveal } from "./GuessReveal";
 import { SHORTCUT_TO_ANSWER } from "./answers";
 import {
   useGameStore,
@@ -12,28 +14,27 @@ import {
   selectPendingCharacter,
   selectThinkingAbout,
 } from "@/state/gameStore";
-import type { Answer, Character, HistoryEntry } from "@/lib/engine/types";
+import type { Answer, HistoryEntry } from "@/lib/engine/types";
 
 const HARD_CAP = 25;
-// Stable empty references — selectors and useMemo branches return these
-// instead of constructing fresh `[]` on every render. Without this the
+// Stable empty reference — selectors and useMemo branches return this instead
+// of constructing fresh `[]` on every render. Without this the
 // useSyncExternalStore inside Zustand 5 thinks state changed every tick and
 // spins into the "getSnapshot should be cached" infinite-loop warning.
 const EMPTY_ANSWERS: readonly Answer[] = [];
-const EMPTY_CHARACTERS: readonly Character[] = [];
 
 export function PlayScreen() {
+  const router = useRouter();
   const hydrated = useGameStore((s) => s.hydrated);
   const status = useGameStore((s) => s.status);
   const loadError = useGameStore((s) => s.loadError);
   const turn = useGameStore((s) => s.engineCore?.turn ?? 0);
+  const gameId = useGameStore((s) => s.gameId);
   // Pull the raw history ref (or undefined). Derivation happens in useMemo
   // below so we never return a new array from a selector.
   const historyRef = useGameStore(
     (s) => s.engineCore?.history as readonly HistoryEntry[] | undefined,
   );
-  const giveUpCandidateIds = useGameStore((s) => s.giveUpCandidateIds);
-  const characters = useGameStore((s) => s.characters);
   const ensureLoaded = useGameStore((s) => s.ensureLoaded);
   const startGame = useGameStore((s) => s.startGame);
   const answer = useGameStore((s) => s.answer);
@@ -51,17 +52,6 @@ export function PlayScreen() {
     return historyRef.map((h) => h.answer);
   }, [historyRef]);
 
-  // Same trick for the give-up top-5 derivation.
-  const giveUpCharacters = useMemo<readonly Character[]>(() => {
-    if (!characters || giveUpCandidateIds.length === 0) return EMPTY_CHARACTERS;
-    const out: Character[] = [];
-    for (const candidate of giveUpCandidateIds) {
-      const c = characters.find((ch) => ch.id === candidate.id);
-      if (c) out.push(c);
-    }
-    return out;
-  }, [characters, giveUpCandidateIds]);
-
   // On mount, either start a fresh game (no prior state) or just rehydrate the
   // runtime dataset for the existing one.
   useEffect(() => {
@@ -76,6 +66,17 @@ export function PlayScreen() {
     // also keeps us from re-running on every status update.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
+
+  // Navigation on terminal states. The engine flips status to "won" / "giveup"
+  // and this effect routes accordingly. M2.5 will replace the /give-up stub
+  // with the real top-5 picker; M2.6 lands the /result page.
+  useEffect(() => {
+    if (status === "won" && gameId) {
+      router.replace(`/result/${gameId}`);
+    } else if (status === "giveup") {
+      router.replace("/give-up");
+    }
+  }, [status, gameId, router]);
 
   // Keyboard answer dispatch — only active in the asking phase.
   useEffect(() => {
@@ -123,84 +124,27 @@ export function PlayScreen() {
 
   if (status === "guessing" && pendingCharacter) {
     return (
-      <Panel kicker="Is it…?" title={pendingCharacter.name.toUpperCase()}>
-        <p className="text-ink-dim mb-4">
-          Guessed in {turn} question{turn === 1 ? "" : "s"}.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => confirmGuess(true)}
-            className="border-victory text-victory hover:bg-victory hover:text-bg font-display border-2 px-5 py-2 tracking-[2px] transition-colors"
-          >
-            Yes!
-          </button>
-          <button
-            type="button"
-            onClick={() => confirmGuess(false)}
-            className="border-villain text-villain hover:bg-villain hover:text-white font-display border-2 px-5 py-2 tracking-[2px] transition-colors"
-          >
-            Nope
-          </button>
-        </div>
-        <p className="text-ink-dimmer mt-4 text-xs">
-          Full guess-reveal modal with character art lands in M2.4.
-        </p>
-      </Panel>
+      <>
+        <Panel kicker="POW!" title="I’VE GOT A HUNCH…">
+          <p className="text-ink-dim">
+            Locking in my guess after {turn} question{turn === 1 ? "" : "s"}.
+          </p>
+        </Panel>
+        <GuessReveal
+          key={pendingCharacter.id}
+          character={pendingCharacter}
+          turn={turn}
+          onYes={() => confirmGuess(true)}
+          onNo={() => confirmGuess(false)}
+        />
+      </>
     );
   }
 
-  if (status === "giveup") {
-    return (
-      <Panel kicker="I Give Up" title="GOT ME">
-        <p className="text-ink-dim mb-3">
-          The engine is out of useful questions. Top guesses (M2.5 will turn
-          this into a picker):
-        </p>
-        <ul className="grid gap-2">
-          {giveUpCharacters.map((c) => (
-            <li
-              key={c.id}
-              className="border-border-soft bg-bg-card flex items-center gap-3 border p-2"
-            >
-              <span className="font-display text-ink text-lg">{c.name}</span>
-              <span className="text-ink-dimmer text-xs">{c.publisher}</span>
-            </li>
-          ))}
-        </ul>
-        <button
-          type="button"
-          onClick={() => void startGame()}
-          className="border-accent text-accent hover:bg-accent hover:text-bg font-display mt-5 inline-block border-2 px-5 py-2 tracking-[2px] transition-colors"
-        >
-          Play Again
-        </button>
-      </Panel>
-    );
-  }
-
-  if (status === "won") {
-    return (
-      <Panel kicker="POW!" title="I GOT YOU">
-        <p className="text-ink-dim mb-4">
-          {pendingCharacter?.name ?? "Unknown"} in {turn} question
-          {turn === 1 ? "" : "s"}.
-        </p>
-        <p className="text-ink-dimmer mb-4 text-xs">
-          Full result screen with art + bio + share button lands in M2.6.
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            reset();
-            void startGame();
-          }}
-          className="border-accent text-accent hover:bg-accent hover:text-bg font-display inline-block border-2 px-5 py-2 tracking-[2px] transition-colors"
-        >
-          Play Again
-        </button>
-      </Panel>
-    );
+  // Won and giveup are routed away by the navigation effect above; render a
+  // brief transitional panel so the screen isn't blank during router.replace.
+  if (status === "won" || status === "giveup") {
+    return <Panel kicker="Reveal" title="REVEALING…" />;
   }
 
   if (status === "lost") {
